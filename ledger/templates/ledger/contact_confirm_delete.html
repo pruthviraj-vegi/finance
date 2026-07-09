@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Delete Contact — {{ object.name }} — My Finace{% endblock %}
+{% block meta_description %}Confirm delete contact.{% endblock %}
+
+{% block page_title %}Delete Contact{% endblock %}
+
+{% block content %}
+<div class="form-card" style="animation: cardUp 0.6s var(--ease-out) both; max-width: 500px;">
+  <div style="text-align: center; margin-bottom: 24px;">
+    <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(251, 113, 133, 0.1); color: var(--accent-expense); display: inline-flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px;">
+      ⚠️
+    </div>
+    <h2 style="font-family: var(--font-heading); font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">Are you sure?</h2>
+    <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5;">
+      You are about to delete the contact <strong>{{ object.name }}</strong>. 
+      This action will soft-delete the contact, but any linked transactions may still be preserved.
+    </p>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions" style="justify-content: center; border-top: none; margin-top: 0; padding-top: 0;">
+      <a href="{% url 'ledger:contact_list' %}" class="btn btn--secondary">Cancel</a>
+      <button type="submit" class="btn btn--danger">Delete Contact</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

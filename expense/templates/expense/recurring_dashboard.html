@@ -1,0 +1,507 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}Recurring Dashboard — My Finance{% endblock %}
+{% block meta_description %}Dashboard overview for recurring subscriptions, EMIs, and upcoming payments.{% endblock %}
+
+{% block page_title %}Recurring Expenses{% endblock %}
+{% block page_actions %}
+<span style="font-size: 13px; color: var(--text-secondary);">Manage your automated commitments and subscriptions.</span>
+{% endblock %}
+
+{% block content %}
+
+<!-- Card Grid -->
+<div class="rc-grid" id="recurringGrid">
+
+  {% for item in active_items %}
+  <div class="glass-panel rc-card" style="animation-delay: {{ forloop.counter0 }}00ms;">
+
+    <!-- ── Top: Type label + Icon/Ring ── -->
+    <div class="rc-card__top">
+
+      {% if item.type == "emi" %}
+        <!-- EMI: label left, ring right -->
+        <div>
+          <span class="rc-type rc-type--emi">Equated Monthly Installment</span>
+          <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="rc-card__name">{{ item.name }}</a>
+          <p class="rc-card__amount">{{ item.amount|currency }} <span class="rc-card__freq">/ {% if item.frequency == "monthly" %}mo{% elif item.frequency == "quarterly" %}qtr{% else %}yr{% endif %}</span></p>
+        </div>
+        {% if item.total_installments %}
+        <div class="rc-ring" title="{{ item.installments_paid|default:0 }} of {{ item.total_installments }} paid">
+          <svg class="rc-ring__svg" viewBox="0 0 36 36">
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="3"/>
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--accent-primary)" stroke-width="3" stroke-dasharray="{% widthratio item.installments_paid item.total_installments 100 %}, 100" stroke-linecap="round" style="filter: drop-shadow(0 0 4px #7C9CFF);"/>
+          </svg>
+          <span class="rc-ring__text">{{ item.installments_paid|default:0 }}/{{ item.total_installments }}</span>
+        </div>
+        {% endif %}
+
+      {% elif item.type == "subscription" %}
+        <!-- Subscription: icon + text block -->
+        <div style="display: flex; align-items: flex-start; gap: 14px;">
+          <div class="rc-icon rc-icon--sub">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+          </div>
+          <div>
+            <span class="rc-type rc-type--sub">Subscription</span>
+            <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="rc-card__name">{{ item.name }}</a>
+            <p class="rc-card__amount">{{ item.amount|currency }} <span class="rc-card__freq">/ {% if item.frequency == "monthly" %}mo{% elif item.frequency == "quarterly" %}qtr{% else %}yr{% endif %}</span></p>
+          </div>
+        </div>
+
+      {% else %}
+        <!-- Renewal: icon + text block -->
+        <div style="display: flex; align-items: flex-start; gap: 14px;">
+          <div class="rc-icon rc-icon--renewal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <span class="rc-type rc-type--renewal">Annual Renewal</span>
+            <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="rc-card__name">{{ item.name }}</a>
+            <p class="rc-card__amount">{{ item.amount|currency }} <span class="rc-card__freq">/ {% if item.frequency == "monthly" %}mo{% elif item.frequency == "quarterly" %}qtr{% else %}yr{% endif %}</span></p>
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+
+    <!-- ── Bottom: Status / Due / Pay ── -->
+    <div class="rc-card__bottom">
+      {% if item.type == "emi" %}
+        <div style="display: flex; align-items: center; gap: 8px;">
+          {% if item.pending_payments and item.pending_payments.0.due_date < today %}
+            <span class="rc-dot rc-dot--overdue"></span>
+            <span style="font-size: 13px; color: var(--accent-expense);">Overdue: {{ item.pending_payments.0.due_date|date:"M d" }}</span>
+          {% elif item.next_due_date %}
+            <span class="rc-dot rc-dot--upcoming"></span>
+            <span style="font-size: 13px; color: var(--text-secondary);">Next: {{ item.next_due_date|date:"M d" }}</span>
+          {% endif %}
+        </div>
+        {% if item.pending_payments %}
+          <a href="{% url 'expense:toggle_recurring_payment' item.pending_payments.0.pk %}?next={{ request.path|urlencode }}" class="rc-pay-btn">Mark as paid</a>
+        {% endif %}
+
+      {% elif item.type == "subscription" %}
+        <div class="rc-meta-row">
+          <div>
+            <span class="rc-meta-label">STATUS</span>
+            <span class="rc-badge rc-badge--active">Active</span>
+          </div>
+          <div style="text-align: right;">
+            <span class="rc-meta-label">NEXT DUE</span>
+            <span class="rc-meta-value">{{ item.next_due_date|date:"M d, Y" }}</span>
+          </div>
+        </div>
+
+      {% elif item.type == "renewal" %}
+        <div class="rc-meta-row">
+          <div>
+            <span class="rc-meta-label">TYPE</span>
+            <span class="rc-badge rc-badge--renewal">{{ item.category.name|default:"Insurance" }}</span>
+          </div>
+          <div style="text-align: right;">
+            <span class="rc-meta-label">EXPIRY</span>
+            <span class="rc-meta-value">{{ item.next_due_date|date:"M d, Y" }}</span>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+  {% endfor %}
+
+  <!-- Add New Recurring Card -->
+  <a href="{% url 'expense:recurring_item_create' %}" class="rc-card rc-card--add" style="animation-delay: {{ active_items|length }}00ms;">
+    <div class="rc-add-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </div>
+    <span class="rc-add-text">Add New Recurring</span>
+  </a>
+</div>
+
+<!-- Summary Stats Bento -->
+<div class="rc-stats" id="recurringStats">
+  <!-- Monthly Commitment — spans 2 cols -->
+  <div class="glass-panel rc-stat rc-stat--wide">
+    <span class="rc-stat__label">MONTHLY COMMITMENT</span>
+    <div class="rc-stat__row">
+      <span class="rc-stat__value">{{ monthly_commitment|currency }}</span>
+    </div>
+    <!-- Breakdown bar -->
+    <div class="rc-bar">
+      {% if total_emis %}<div class="rc-bar__seg rc-bar__seg--emi" style="flex: {{ total_emis }};"></div>{% endif %}
+      {% if total_subscriptions %}<div class="rc-bar__seg rc-bar__seg--sub" style="flex: {{ total_subscriptions }};"></div>{% endif %}
+      {% if total_renewals %}<div class="rc-bar__seg rc-bar__seg--renewal" style="flex: {{ total_renewals }};"></div>{% endif %}
+    </div>
+    <div class="rc-legend">
+      {% if total_emis %}<div class="rc-legend__item"><span class="rc-legend__dot" style="background: var(--accent-primary);"></span>EMIs</div>{% endif %}
+      {% if total_subscriptions %}<div class="rc-legend__item"><span class="rc-legend__dot" style="background: var(--accent-income);"></span>Subs</div>{% endif %}
+      {% if total_renewals %}<div class="rc-legend__item"><span class="rc-legend__dot" style="background: #ffb2b9;"></span>Renewals</div>{% endif %}
+    </div>
+  </div>
+
+  <!-- Active Schedules -->
+  <div class="glass-panel rc-stat rc-stat--center">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent-pending)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom: 8px;"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
+    <span class="rc-stat__big">{{ total_active }}</span>
+    <span class="rc-stat__label">Active Schedules</span>
+  </div>
+
+  <!-- Overdue -->
+  <div class="glass-panel rc-stat rc-stat--center">
+    {% if overdue_count > 0 %}
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent-expense)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom: 8px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span class="rc-stat__big" style="color: var(--accent-expense);">{{ overdue_sum|currency }}</span>
+      <span class="rc-stat__label">{{ overdue_count }} Overdue</span>
+    {% else %}
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent-income)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom: 8px;"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="rc-stat__big" style="color: var(--accent-income);">All Clear</span>
+      <span class="rc-stat__label">No Overdue Payments</span>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<style>
+/* ═══════════════════════════════════════════════
+   RECURRING DASHBOARD – Vault Glass
+   Matches Stitch MCP design spec exactly.
+   ═══════════════════════════════════════════════ */
+
+/* ── Grid ─────────────────────────────────── */
+.rc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* ── Card ─────────────────────────────────── */
+.rc-card {
+  padding: 16px !important;
+  border-radius: 12px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 180px;
+  transition: all 300ms ease;
+  animation: cardUp 0.6s var(--ease-out) both;
+}
+.rc-card:hover {
+  transform: translateY(-2px);
+  box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.25), 0 32px 32px rgba(0,0,0,0.32);
+}
+
+/* ── Top section ─────────────────────────── */
+.rc-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* ── Type labels ─────────────────────────── */
+.rc-type {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+.rc-type--emi     { color: var(--accent-primary); }
+.rc-type--sub     { color: #45dfa4; }
+.rc-type--renewal { color: #ffb2b9; }
+
+/* ── Name ────────────────────────────────── */
+.rc-card__name {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  margin-bottom: 4px;
+}
+.rc-card__name:hover { color: var(--accent-primary); }
+
+/* ── Amount ──────────────────────────────── */
+.rc-card__amount {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+.rc-card__freq {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/* ── Radial ring (EMI) ───────────────────── */
+.rc-ring {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+.rc-ring__svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.rc-ring__text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Icon (Sub / Renewal) ────────────────── */
+.rc-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: var(--surface-container-high);
+}
+.rc-icon--sub     { color: var(--accent-primary); }
+.rc-icon--renewal { color: #ffb2b9; }
+
+/* ── Bottom section ──────────────────────── */
+.rc-card__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+/* ── Dot indicators ──────────────────────── */
+.rc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.rc-dot--upcoming { background: var(--accent-income); }
+.rc-dot--overdue  { background: var(--accent-expense); animation: pulse-dot 2s ease infinite; }
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(251,113,133,0.4); }
+  50%      { box-shadow: 0 0 0 6px rgba(251,113,133,0); }
+}
+
+/* ── Mark as paid button ─────────────────── */
+.rc-pay-btn {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #002979;
+  background: var(--accent-primary);
+  border-radius: 9999px;
+  padding: 6px 14px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 200ms ease;
+}
+.rc-pay-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(124,156,255,0.3);
+}
+.rc-pay-btn:active { transform: scale(0.95); }
+
+/* ── Meta row (Sub / Renewal footer) ─────── */
+.rc-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  padding-top: 12px;
+}
+.rc-meta-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.rc-meta-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* ── Badges ──────────────────────────────── */
+.rc-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.rc-badge--active {
+  background: rgba(69,223,164,0.10);
+  color: #45dfa4;
+  border: 1px solid rgba(69,223,164,0.20);
+}
+.rc-badge--renewal {
+  background: rgba(255,178,185,0.10);
+  color: #ffb2b9;
+  border: 1px solid rgba(255,178,185,0.20);
+}
+
+/* ── Add New Card ────────────────────────── */
+.rc-card--add {
+  border: 2px dashed rgba(255,255,255,0.12) !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  animation: cardUp 0.6s var(--ease-out) both;
+}
+.rc-card--add:hover {
+  border-color: rgba(124,156,255,0.4) !important;
+  background: rgba(124,156,255,0.05) !important;
+  transform: translateY(-2px);
+}
+.rc-add-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 200ms ease;
+}
+.rc-card--add:hover .rc-add-icon {
+  background: var(--accent-primary);
+  color: #002979;
+}
+.rc-add-text {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.rc-card--add:hover .rc-add-text { color: var(--accent-primary); }
+
+/* ══ Summary Stats Bento ══════════════════ */
+.rc-stats {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 24px;
+  margin-top: 32px;
+}
+.rc-stat {
+  padding: 16px !important;
+  border-radius: 12px !important;
+  height: 180px;
+  animation: cardUp 0.6s var(--ease-out) 0.4s both;
+}
+.rc-stat--center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.rc-stat__label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.rc-stat__value {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.rc-stat__big {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.rc-stat__row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+/* ── Breakdown bar ───────────────────────── */
+.rc-bar {
+  display: flex;
+  gap: 4px;
+  height: 8px;
+  margin-top: 20px;
+}
+.rc-bar__seg {
+  border-radius: 9999px;
+}
+.rc-bar__seg--emi     { background: var(--accent-primary); }
+.rc-bar__seg--sub     { background: #45dfa4; }
+.rc-bar__seg--renewal { background: #ffb2b9; }
+
+/* ── Legend ───────────────────────────────── */
+.rc-legend {
+  display: flex;
+  gap: 20px;
+  margin-top: 14px;
+}
+.rc-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.rc-legend__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 1200px) {
+  .rc-grid  { grid-template-columns: repeat(2, 1fr); }
+  .rc-stats { grid-template-columns: 1fr 1fr; }
+  .rc-stat--wide { grid-column: span 2; }
+}
+@media (max-width: 768px) {
+  .rc-grid  { grid-template-columns: 1fr; }
+  .rc-stats { grid-template-columns: 1fr; }
+  .rc-stat--wide { grid-column: span 1; }
+  .rc-card { height: auto; min-height: 160px; }
+}
+</style>
+{% endblock %}

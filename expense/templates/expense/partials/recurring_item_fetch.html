@@ -1,0 +1,133 @@
+{% load custom_filters %}
+
+<div style="display: flex; align-items: center; gap: 24px; padding: 10px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); border-bottom: 1px solid rgba(255, 255, 255, 0.06); margin-bottom: 12px; font-weight: 600;">
+  <!-- Name Column -->
+  <span class="sortable" data-sort="name" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 160px; flex-shrink: 0;">
+    Name
+    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+      {% if current_sort == "name" %}↑{% elif current_sort == "-name" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <!-- Type & Frequency Column -->
+  <span class="sortable" data-sort="type" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 120px; flex-shrink: 0;">
+    Type
+    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+      {% if current_sort == "type" %}↑{% elif current_sort == "-type" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <!-- Category Column -->
+  <span class="sortable" data-sort="category" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 130px; flex-shrink: 0;">
+    Category
+    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+      {% if current_sort == "category" %}↑{% elif current_sort == "-category" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <!-- Next Due Date Column -->
+  <span class="sortable" data-sort="next_due_date" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 110px; flex-shrink: 0;">
+    Next Due
+    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+      {% if current_sort == "next_due_date" %}↑{% elif current_sort == "-next_due_date" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <!-- Amount Column -->
+  <span class="sortable" data-sort="amount" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 110px; flex-shrink: 0; justify-content: flex-end;">
+    Amount
+    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+      {% if current_sort == "amount" %}↑{% elif current_sort == "-amount" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <!-- Status Column -->
+  <span style="user-select: none; flex: 1; min-width: 0; text-align: center;">Status</span>
+
+  <!-- Actions -->
+  <span style="width: 100px; text-align: right; user-select: none; flex-shrink: 0;">Actions</span>
+</div>
+
+<div class="recurring-list" style="display: flex; flex-direction: column; gap: 8px;">
+  {% for item in page_obj %}
+    <div class="glass-panel group" style="display: flex; align-items: center; gap: 24px; padding: 10px 16px !important; border-radius: 12px !important; transition: all var(--transition-fast); background: var(--glass-fill); margin-bottom: 0;">
+      
+      <!-- Name -->
+      <div style="width: 160px; min-width: 0; flex-shrink: 0;">
+        <p style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          <a href="{% url 'expense:recurring_item_detail' item.pk %}" style="color: inherit; text-decoration: none;" onmouseover="this.style.color='var(--accent-primary)';" onmouseout="this.style.color='inherit';">{{ item.name }}</a>
+        </p>
+      </div>
+
+      <!-- Type & Frequency -->
+      <div style="width: 120px; flex-shrink: 0;">
+        <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">
+          {{ item.get_type_display }}
+        </p>
+        <p style="font-size: 10px; color: var(--text-muted); margin: 0; text-transform: capitalize;">
+          {{ item.frequency }}
+        </p>
+      </div>
+
+      <!-- Category -->
+      <div style="width: 130px; flex-shrink: 0; display: flex; align-items: center;">
+        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 6px; font-size: 11px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ item.category.color|default:'#7C9CFF' }}; display: inline-block;"></span>
+          {{ item.category.name|default:"Uncategorized" }}
+        </span>
+      </div>
+
+      <!-- Next Due Date -->
+      <div style="width: 110px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); flex-shrink: 0;">
+        {% if item.active %}
+          {{ item.next_due_date|date:"d M Y" }}
+        {% else %}
+          —
+        {% endif %}
+      </div>
+
+      <!-- Amount -->
+      <div style="width: 110px; text-align: right; font-family: var(--font-mono); font-weight: 600; font-size: 13px; color: var(--accent-expense); flex-shrink: 0;">
+        {{ item.amount|currency }}
+      </div>
+
+      <!-- Status badge -->
+      <div style="flex: 1; min-width: 0; text-align: center;">
+        {% if item.active %}
+          <span style="display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; background: rgba(52, 211, 153, 0.12); color: var(--accent-income); border: 1px solid rgba(52, 211, 153, 0.2);">ACTIVE</span>
+        {% else %}
+          <span style="display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; background: rgba(251, 113, 133, 0.12); color: var(--accent-expense); border: 1px solid rgba(251, 113, 133, 0.2);">PAUSED</span>
+        {% endif %}
+      </div>
+
+      <!-- Actions -->
+      <div style="display: inline-flex; gap: 6px; justify-content: flex-end; align-items: center; flex-shrink: 0; width: 100px;">
+        <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="btn btn--secondary btn--sm btn--icon" title="View Details / Checklist" style="padding: 0; border-radius: 8px; border: 1px solid var(--glass-border); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--glass-fill); color: var(--accent-primary);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </a>
+        <a href="{% url 'expense:recurring_item_update' item.pk %}" class="btn btn--secondary btn--sm btn--icon" title="Edit Item" style="padding: 0; border-radius: 8px; border: 1px solid var(--glass-border); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--glass-fill);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+        </a>
+        <a href="{% url 'expense:recurring_item_delete' item.pk %}" class="btn btn--danger btn--sm btn--icon" title="Delete Item" style="padding: 0; border-radius: 8px; border: 1px solid rgba(251, 113, 133, 0.15); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--glass-fill);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+        </a>
+      </div>
+    </div>
+  {% empty %}
+    <div class="glass-panel" style="text-align: center; padding: 48px; color: var(--text-secondary); border-radius: 12px !important;">
+      <div style="margin-bottom: 12px; font-size: 24px;">🔄</div>
+      <p>No recurring items found matching the criteria.</p>
+    </div>
+  {% endfor %}
+</div>

@@ -1,0 +1,116 @@
+{% load custom_filters %}
+<div style="display: flex; align-items: center; gap: 24px; padding: 10px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); border-bottom: 1px solid rgba(255, 255, 255, 0.06); margin-bottom: 12px; font-weight: 600;">
+  <!-- Spacer for Avatar -->
+  <div style="width: 32px; margin-right: 12px; flex-shrink: 0;"></div>
+  
+  <!-- Name -->
+  <span class="sortable" data-sort="name" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 180px; flex-shrink: 0;">
+    Name
+    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+      {% if current_sort == "name" %}↑{% elif current_sort == "-name" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <!-- Phone Number -->
+  <span class="sortable" data-sort="phone_number" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 120px; flex-shrink: 0;">
+    Phone Number
+    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+      {% if current_sort == "phone_number" %}↑{% elif current_sort == "-phone_number" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <!-- Amount -->
+  <span style="width: 120px; user-select: none; flex-shrink: 0;">Amount</span>
+
+  <!-- Notes -->
+  <span class="hidden md:inline" style="user-select: none; flex: 1; min-width: 0;">Notes</span>
+
+  <!-- Created At -->
+  <span class="sortable hidden sm:inline" data-sort="created_at" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 100px; flex-shrink: 0; justify-content: flex-end;">
+    Created At
+    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+      {% if current_sort == "created_at" %}↑{% elif current_sort == "-created_at" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <!-- Actions -->
+  <span style="width: 100px; text-align: right; user-select: none; flex-shrink: 0;">Actions</span>
+</div>
+
+<div class="contact-list" style="display: flex; flex-direction: column; gap: 8px;">
+  {% for contact in page_obj %}
+    <div class="glass-panel group" style="display: flex; align-items: center; gap: 24px; padding: 10px 16px !important; border-radius: 12px !important; transition: all var(--transition-fast); background: var(--glass-fill); margin-bottom: 0;">
+      <!-- Avatar Icon -->
+      <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(124, 156, 255, 0.08); border: 1px solid rgba(124, 156, 255, 0.15); display: flex; align-items: center; justify-content: center; color: var(--accent-primary); margin-right: 12px; flex-shrink: 0; transition: transform var(--transition-fast);" class="group-hover-scale">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+
+      <!-- Name -->
+      <div style="width: 180px; min-width: 0; flex-shrink: 0;">
+        <p style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          <a href="{% url 'ledger:contact_detail' contact.pk %}" style="color: inherit; text-decoration: none;" onmouseover="this.style.color='var(--accent-primary)';" onmouseout="this.style.color='inherit';">{{ contact.name }}</a>
+        </p>
+      </div>
+
+      <!-- Phone Number -->
+      <div style="width: 120px; min-width: 0; flex-shrink: 0;">
+        <p style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          {{ contact.phone_number|default:"—" }}
+        </p>
+      </div>
+
+      <!-- Net Balance / Amount -->
+      <div style="width: 120px; font-family: var(--font-mono); font-weight: 600; font-size: 13px; flex-shrink: 0;">
+        {% if contact.net_balance > 0 %}
+          <span style="color: var(--accent-income);">+{{ contact.net_balance|currency }}</span>
+        {% elif contact.net_balance < 0 %}
+          <span style="color: var(--accent-expense);">{{ contact.net_balance|currency }}</span>
+        {% else %}
+          <span style="color: var(--text-muted);">0.00</span>
+        {% endif %}
+      </div>
+
+      <!-- Notes -->
+      <div class="hidden md:block" style="flex: 1; min-width: 0; font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        {{ contact.notes|default:"—" }}
+      </div>
+
+      <!-- Created Date -->
+      <div class="hidden sm:block" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); text-align: right; flex-shrink: 0; width: 100px;">
+        {{ contact.created_at|date:"d M Y" }}
+      </div>
+
+      <!-- Actions -->
+      <div style="display: inline-flex; gap: 6px; justify-content: flex-end; align-items: center; flex-shrink: 0; width: 100px;">
+        <a href="{% url 'ledger:contact_detail' contact.pk %}" class="btn btn--secondary btn--sm btn--icon" title="View Details" style="padding: 0; border-radius: 8px; border: 1px solid var(--glass-border); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--glass-fill); color: var(--accent-primary);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </a>
+        <a href="{% url 'ledger:contact_update' contact.pk %}" class="btn btn--secondary btn--sm btn--icon" title="Edit Contact" style="padding: 0; border-radius: 8px; border: 1px solid var(--glass-border); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--glass-fill);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+        </a>
+        <a href="{% url 'ledger:contact_delete' contact.pk %}" class="btn btn--danger btn--sm btn--icon" title="Delete Contact" style="padding: 0; border-radius: 8px; border: 1px solid rgba(251, 113, 133, 0.15); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--glass-fill);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+        </a>
+      </div>
+    </div>
+  {% empty %}
+    <div class="glass-panel" style="text-align: center; padding: 48px; color: var(--text-secondary); border-radius: 12px !important;">
+      <div style="margin-bottom: 12px; font-size: 24px;">👥</div>
+      <p>No contacts found matching the criteria.</p>
+    </div>
+  {% endfor %}
+</div>

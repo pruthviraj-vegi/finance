@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Dashboard — Finance{% endblock %}
+{% block meta_description %}Your financial overview at a glance. Track income, expenses, and transactions.{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<!-- Live Dashboard Marker to bypass script.js random generation -->
+<div id="live-dashboard-marker" style="display: none;"></div>
+
+<!-- Welcome Header -->
+<div class="welcome-header">
+  <div>
+    <h2 class="welcome-header-title">Welcome back, {{ user.first_name|default:user.username|default:"User" }}</h2>
+    <p class="welcome-header-subtitle">Your financial ecosystem is performing with precision today.</p>
+  </div>
+  <div class="welcome-header-date">
+    <div id="currentDay" class="welcome-header-day">Monday</div>
+    <div id="currentDate" class="welcome-header-full">12 Oct 2026</div>
+  </div>
+</div>
+
+<!-- Stats Cards Row -->
+<section class="stats-grid" id="statsGrid">
+  <!-- Spent Card -->
+  <div class="stat-card" id="statExpense">
+    <div class="stat-card__header">
+      <span class="font-label-caps text-label-caps text-on-surface-variant">TOTAL SPENT</span>
+      <span class="material-symbols-outlined text-accent-expense text-lg">trending_down</span>
+    </div>
+    <div class="font-num-xl text-num-xl text-on-surface">{{ total_expense|currency }}</div>
+    <div class="flex items-center gap-1.5" style="display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 8px;">
+      <span class="{% if expense_trend_is_up %}text-accent-expense{% else %}text-accent-income{% endif %} font-num-sm">
+        {% if expense_trend_is_up %}+{% else %}-{% endif %}{{ expense_trend_abs }}%
+      </span>
+      <span class="text-on-surface-variant">vs last month</span>
+    </div>
+  </div>
+  
+  <!-- Income Card -->
+  <div class="stat-card" id="statIncome">
+    <div class="stat-card__header">
+      <span class="font-label-caps text-label-caps text-on-surface-variant">TOTAL INCOME</span>
+      <span class="material-symbols-outlined text-accent-income text-lg">trending_up</span>
+    </div>
+    <div class="font-num-xl text-num-xl text-on-surface">{{ total_income|currency }}</div>
+    <div class="flex items-center gap-1.5" style="display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 8px;">
+      <span class="{% if income_trend_is_up %}text-accent-income{% else %}text-accent-expense{% endif %} font-num-sm">
+        {% if income_trend_is_up %}+{% else %}-{% endif %}{{ income_trend_abs }}%
+      </span>
+      <span class="text-on-surface-variant">vs last month</span>
+    </div>
+  </div>
+
+  <!-- Due Card -->
+  <div class="stat-card" id="statPending">
+    <div class="stat-card__header">
+      <span class="font-label-caps text-label-caps text-on-surface-variant">TOTAL DUE</span>
+      <span class="material-symbols-outlined text-accent-pending text-lg">schedule</span>
+    </div>
+    <div class="font-num-xl text-num-xl text-on-surface">{{ pending_amount|currency }}</div>
+    <div class="flex items-center gap-1.5" style="display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 8px;">
+      <span class="text-on-surface font-bold">{{ pending_count }}</span>
+      <span class="text-on-surface-variant">pending item{{ pending_count|pluralize }}</span>
+    </div>
+  </div>
+
+  <!-- Net Balance Card -->
+  <div class="stat-card" id="statBalance" style="border-color: rgba(124, 156, 255, 0.2); background: rgba(124, 156, 255, 0.05);">
+    <div class="stat-card__header">
+      <span class="font-label-caps text-label-caps text-accent-primary">NET BALANCE</span>
+      <span class="material-symbols-outlined text-accent-primary text-lg" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+    </div>
+    <div class="font-num-xl text-num-xl text-on-surface">{{ net_balance|currency }}</div>
+    <div class="flex items-center gap-1.5" style="display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 8px;">
+      <span class="text-accent-primary font-num-sm">Stable</span>
+      <span class="text-on-surface-variant">growth trajectory</span>
+    </div>
+  </div>
+</section>
+
+<!-- Middle Row: Charts -->
+<section class="dashboard-row">
+  <!-- Trend Line Chart Glass Card -->
+  <div class="glass-panel" style="display: flex; flex-direction: column; min-height: 320px; position: relative; overflow: hidden;">
+    <div class="trend-chart-header">
+      <div class="trend-chart-title-wrap">
+        <h3 class="trend-chart-title">Financial Momentum</h3>
+        <p class="trend-chart-subtitle">Cash flow trend (net flow)</p>
+      </div>
+      <div class="trend-chart-chips">
+        <button class="chip" data-period="1M">1M</button>
+        <button class="chip bg-accent-primary text-on-primary" data-period="6M">6M</button>
+        <button class="chip" data-period="1Y">1Y</button>
+      </div>
+    </div>
+    <div class="trend-chart-svg-wrap">
+      <svg class="w-full h-full" id="trendChartSvg" preserveAspectRatio="none" viewBox="0 0 800 160">
+        <defs>
+          <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#7C9CFF" stop-opacity="0.3"></stop>
+            <stop offset="100%" stop-color="#7C9CFF" stop-opacity="0"></stop>
+          </linearGradient>
+        </defs>
+        <!-- Grid Lines -->
+        <line stroke="rgba(255,255,255,0.05)" stroke-width="1" x1="0" x2="800" y1="40" y2="40"></line>
+        <line stroke="rgba(255,255,255,0.05)" stroke-width="1" x1="0" x2="800" y1="80" y2="80"></line>
+        <line stroke="rgba(255,255,255,0.05)" stroke-width="1" x1="0" x2="800" y1="120" y2="120"></line>
+        <!-- Area Fill -->
+        <path id="chartAreaPath" fill="url(#chartGradient)"></path>
+        <!-- Trend Line -->
+        <path class="trend-line" id="chartTrendLine" fill="none" stroke="#7C9CFF" stroke-linecap="round" stroke-width="2.5"></path>
+      </svg>
+    </div>
+    <div class="trend-chart-labels" id="chartLabels">
+      <!-- Rendered dynamically by JS -->
+    </div>
+  </div>
+
+  <!-- Donut Chart Glass Card -->
+  <div class="glass-panel" style="display: flex; flex-direction: column; min-height: 320px;">
+    <div class="category-breakdown-container">
+      <div class="category-breakdown-header-wrap">
+        <h3 class="trend-chart-title">Category Breakdown</h3>
+        <p class="trend-chart-subtitle">Monthly expenditure distribution</p>
+      </div>
+      <div class="category-breakdown-donut-wrapper">
+        <svg class="category-breakdown-donut-svg" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15.9155" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="3"></circle>
+          {% if category_breakdown %}
+            {% for cat in category_breakdown %}
+              <path class="transition-all duration-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="{{ cat.color }}" stroke-dasharray="{{ cat.dash_array }}" stroke-dashoffset="{{ cat.dash_offset }}" stroke-linecap="round" stroke-width="3" style="filter: drop-shadow({{ cat.color }} 0px 0px 3px); opacity: 0.9;"></path>
+            {% endfor %}
+          {% else %}
+            <circle cx="18" cy="18" r="15.9155" fill="none" stroke="var(--glass-border)" stroke-dasharray="100, 100" stroke-width="3"></circle>
+          {% endif %}
+        </svg>
+        <div class="category-breakdown-donut-center">
+          <div class="category-breakdown-donut-inner">
+            <span class="category-breakdown-donut-val">{{ total_expense|currency_abbreviation }}</span>
+            <span class="category-breakdown-donut-lbl">TOTAL</span>
+          </div>
+        </div>
+      </div>
+      <div class="category-breakdown-legend">
+        {% for cat in category_breakdown|slice:":4" %}
+          <div class="category-breakdown-legend-item">
+            <div class="category-breakdown-legend-dot" style="background-color: {{ cat.color }};"></div>
+            <span class="category-breakdown-legend-text" title="{{ cat.name }}">{{ cat.name }}</span>
+          </div>
+        {% empty %}
+          <div style="grid-column: span 2; text-align: center; font-size: 12px; color: var(--text-secondary);">No expense data available</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Bottom Row: Equal grid for Upcoming & Loan Portfolio -->
+<section class="equal-grid">
+  <!-- Upcoming Recurring -->
+  <div class="glass-panel" style="display: flex; flex-direction: column;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <h3 class="trend-chart-title" style="margin: 0;">Upcoming Recurring</h3>
+      <a href="{% url 'expense:recurring_item_list' %}" style="font-size: 12px; color: var(--accent-primary); font-weight: 500;">View All</a>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px; flex-grow: 1;">
+      {% for payment in upcoming_recurring %}
+      <div class="group" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--glass-fill-dark); border-radius: 16px; transition: all 0.3s; position: relative;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <!-- Custom circular progress ring -->
+          <div style="position: relative; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+            <svg style="position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg);" viewBox="0 0 48 48">
+              <circle cx="24" cy="24" fill="none" r="20" stroke="rgba(255,255,255,0.05)" stroke-width="3"></circle>
+              <circle class="progress-ring-circle" cx="24" cy="24" fill="none" r="20" stroke="#7C9CFF" stroke-dasharray="125.6" stroke-dashoffset="{{ payment.dash_offset }}" stroke-width="3"></circle>
+            </svg>
+            <span class="material-symbols-outlined text-accent-primary" style="font-size: 16px;">{{ payment.icon }}</span>
+          </div>
+          <div>
+            <div style="font-weight: 700; font-size: 14px; color: var(--text-primary);">{{ payment.name }}</div>
+            <div style="font-size: 12px; color: var(--text-secondary);">{{ payment.due_text }}</div>
+          </div>
+        </div>
+        <!-- Amount or Pay Hover Button -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-family: var(--font-mono); font-size: 14px; color: var(--text-primary); transition: all 0.2s;" class="amount-val">{{ payment.amount|currency }}</span>
+          <a href="{% url 'expense:toggle_recurring_payment' payment.id %}?next={{ request.path|urlencode }}" class="pay-btn" style="display: none; background: var(--accent-primary); color: #002979; font-weight: 700; font-size: 11px; padding: 4px 12px; border-radius: 9999px;">
+            PAY
+          </a>
+        </div>
+      </div>
+      {% empty %}
+      <p style="text-align: center; color: var(--text-secondary); font-size: 14px; padding: 24px 0; margin: auto;">No upcoming recurring payments.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Loan Portfolio -->
+  <div class="glass-panel" style="display: flex; flex-direction: column;">
+    <h3 class="trend-chart-title" style="margin: 0 0 24px 0;">Loan Portfolio</h3>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; flex-grow: 1;">
+      <!-- Owed to you -->
+      <div style="padding: 16px; border-radius: 20px; background: rgba(52, 211, 153, 0.05); border: 1px solid rgba(52, 211, 153, 0.15); display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+            <span class="material-symbols-outlined text-accent-income" style="font-size: 16px; font-variation-settings: 'FILL' 1;">call_received</span>
+            <span class="font-label-caps text-label-caps text-accent-income" style="font-size: 10px; font-weight: 700;">OWED TO YOU</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">From {{ lent_contracts }} contract{{ lent_contracts|pluralize }}</p>
+        </div>
+        <div style="margin-top: 24px;">
+          <div class="font-num-xl text-num-xl text-on-surface" style="font-size: 20px;">{{ owed_to_you|currency }}</div>
+          <div style="width: 100%; height: 4px; border-radius: 9999px; background: rgba(255,255,255,0.05); margin-top: 12px; overflow: hidden;">
+            <div style="height: 100%; background: var(--accent-income); width: {{ lent_repaid_pct }}%;"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-secondary);">
+            <span>{{ lent_repaid_pct }}% repaid</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- You owe -->
+      <div style="padding: 16px; border-radius: 20px; background: rgba(251, 113, 133, 0.05); border: 1px solid rgba(251, 113, 133, 0.15); display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+            <span class="material-symbols-outlined text-accent-expense" style="font-size: 16px; font-variation-settings: 'FILL' 1;">call_made</span>
+            <span class="font-label-caps text-label-caps text-accent-expense" style="font-size: 10px; font-weight: 700;">YOU OWE</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">From {{ borrowed_contracts }} active loan{{ borrowed_contracts|pluralize }}</p>
+        </div>
+        <div style="margin-top: 24px;">
+          <div class="font-num-xl text-num-xl text-on-surface" style="font-size: 20px;">{{ you_owe|currency }}</div>
+          <div style="width: 100%; height: 4px; border-radius: 9999px; background: rgba(255,255,255,0.05); margin-top: 12px; overflow: hidden;">
+            <div style="height: 100%; background: var(--accent-expense); width: {{ borrowed_repaid_pct }}%;"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--text-secondary);">
+            <span>{{ borrowed_repaid_pct }}% repaid</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a href="{% url 'ledger:contact_list' %}" style="display: block; width: 100%; margin-top: 24px; text-align: center; padding: 12px; border-radius: 16px; background: var(--text-primary); color: var(--bg-base); font-weight: 700; font-size: 14px;">
+      MANAGE ALL LOANS
+    </a>
+  </div>
+</section>
+
+<!-- Floating Action Button (FAB) for transaction creation -->
+<a href="{% url 'expense:transaction_create' %}" class="dashboard-fab" title="Add Transaction">
+  <span class="material-symbols-outlined text-2xl">add</span>
+</a>
+
+<!-- Embed Chart JSON Data -->
+<script id="chart-data" type="application/json">{{ chart_data_json|safe }}</script>
+
+<!-- Add hover behavior styling for pay-btn -->
+<style>
+  .group:hover .amount-val {
+    display: none !important;
+  }
+  .group:hover .pay-btn {
+    display: inline-block !important;
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/dashboard.js' %}"></script>
+{% endblock %}

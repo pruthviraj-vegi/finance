@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  {% if is_create %}Add New Contact{% else %}Edit Contact — {{ object.name }}{% endif %} — My Finace
+{% endblock %}
+
+{% block meta_description %}Create or update a financial contact record.{% endblock %}
+
+{% block page_title %}
+  {% if is_create %}Add New Contact{% else %}Edit Contact{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="form-card" style="animation: cardUp 0.6s var(--ease-out) both;">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    <!-- Non-field errors -->
+    {% if form.non_field_errors %}
+      <div class="alert alert--error" role="alert" style="margin-bottom: 20px;">
+        {% for error in form.non_field_errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Name Field -->
+    <div class="form-group">
+      <label for="{{ form.name.id_for_label }}" class="form-label">Contact Name *</label>
+      {{ form.name }}
+      {% if form.name.errors %}
+        <span class="form-error">{{ form.name.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Phone Number Field -->
+    <div class="form-group">
+      <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
+      {{ form.phone_number }}
+      {% if form.phone_number.errors %}
+        <span class="form-error">{{ form.phone_number.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Notes Field -->
+    <div class="form-group">
+      <label for="{{ form.notes.id_for_label }}" class="form-label">Notes / Relationship</label>
+      {{ form.notes }}
+      {% if form.notes.errors %}
+        <span class="form-error">{{ form.notes.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <a href="{% url 'ledger:contact_list' %}" class="btn btn--secondary">Cancel</a>
+      <button type="submit" class="btn btn--primary">
+        {% if is_create %}Create Contact{% else %}Save Changes{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

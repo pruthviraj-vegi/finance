@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if is_create %}Add Transaction{% else %}Edit Transaction{% endif %} — My Finance
+{% endblock %}
+
+{% block page_title %}
+  {% if is_create %}Add Transaction{% else %}Edit Transaction{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    <!-- Support redirection back to referrer (e.g. from recurring item detail) -->
+    <input type="hidden" name="next" value="{{ next_url }}" />
+
+    {% if form.non_field_errors %}
+      <div style="margin-bottom: 20px; color: var(--error);">
+        {% for error in form.non_field_errors %}
+          <p class="form-error">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Amount Field -->
+    <div class="form-group">
+      <label for="{{ form.amount.id_for_label }}" class="form-label">Amount</label>
+      {{ form.amount }}
+      {% if form.amount.errors %}
+        {% for error in form.amount.errors %}
+          <span class="form-error">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Type Field -->
+    <div class="form-group">
+      <label for="{{ form.type.id_for_label }}" class="form-label">Transaction Type</label>
+      {{ form.type }}
+      {% if form.type.errors %}
+        {% for error in form.type.errors %}
+          <span class="form-error">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Category Field -->
+    <div class="form-group">
+      <label for="{{ form.category.id_for_label }}" class="form-label">Category</label>
+      {{ form.category }}
+      {% if form.category.errors %}
+        {% for error in form.category.errors %}
+          <span class="form-error">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
+      <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+        Don't see your category? <a href="{% url 'expense:category_create' %}" style="color: var(--accent-primary); text-decoration: underline;">Create a new category</a> first.
+      </p>
+    </div>
+
+    <!-- Date Field -->
+    <div class="form-group">
+      <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
+      {{ form.date }}
+      {% if form.date.errors %}
+        {% for error in form.date.errors %}
+          <span class="form-error">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Note Field -->
+    <div class="form-group">
+      <label for="{{ form.note.id_for_label }}" class="form-label">Note / Description</label>
+      {{ form.note }}
+      {% if form.note.errors %}
+        {% for error in form.note.errors %}
+          <span class="form-error">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <a href="{% if next_url %}{{ next_url }}{% else %}{% url 'expense:transaction_list' %}{% endif %}" class="btn btn--secondary">Cancel</a>
+      <button type="submit" class="btn btn--primary">
+        {% if is_create %}Record Transaction{% else %}Save Changes{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

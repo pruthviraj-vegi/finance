@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Record Repayment — My Finance{% endblock %}
+{% block meta_description %}Record a payment or repayment against a transaction.{% endblock %}
+
+{% block page_title %}Record Repayment{% endblock %}
+
+{% block content %}
+<div class="form-card" style="animation: cardUp 0.6s var(--ease-out) both;">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if next_url %}
+      <input type="hidden" name="next" value="{{ next_url }}">
+    {% endif %}
+    
+    <!-- Non-field errors -->
+    {% if form.non_field_errors %}
+      <div class="alert alert--error" role="alert" style="margin-bottom: 20px;">
+        {% for error in form.non_field_errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Target Transaction Field -->
+    <div class="form-group">
+      <label for="{{ form.transaction.id_for_label }}" class="form-label">Target Transaction *</label>
+      {{ form.transaction }}
+      {% if form.transaction.errors %}
+        <span class="form-error">{{ form.transaction.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Amount Field -->
+    <div class="form-group">
+      <label for="{{ form.amount.id_for_label }}" class="form-label">Repayment Amount (₹) *</label>
+      {{ form.amount }}
+      {% if form.amount.errors %}
+        <span class="form-error">{{ form.amount.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Date Field -->
+    <div class="form-group">
+      <label for="{{ form.date.id_for_label }}" class="form-label">Date *</label>
+      {{ form.date }}
+      {% if form.date.errors %}
+        <span class="form-error">{{ form.date.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Note Field -->
+    <div class="form-group">
+      <label for="{{ form.note.id_for_label }}" class="form-label">Note / Memo</label>
+      {{ form.note }}
+      {% if form.note.errors %}
+        <span class="form-error">{{ form.note.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <a href="{% if next_url %}{{ next_url }}{% else %}{% url 'ledger:contact_list' %}{% endif %}" class="btn btn--secondary">Cancel</a>
+      <button type="submit" class="btn btn--primary">Save Repayment</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

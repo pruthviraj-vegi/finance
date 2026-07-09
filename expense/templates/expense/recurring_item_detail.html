@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}{{ item.name }} — Recurring Item Detail{% endblock %}
+{% block meta_description %}View detail schedule and pay cycles for {{ item.name }}.{% endblock %}
+
+{% block page_title %}Recurring Detail{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; gap: 24px;">
+
+  <!-- Back Link & Main Header Details -->
+  <div style="display: flex; align-items: center; justify-content: space-between; animation: cardUp 0.6s var(--ease-out) both;">
+    <a href="{% url 'expense:recurring_item_list' %}" class="btn btn--secondary btn--sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:8px;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span>Back to Recurring List</span>
+    </a>
+    
+    <div style="display: flex; gap: 8px;">
+      <a href="{% url 'expense:recurring_item_update' item.pk %}" class="btn btn--secondary btn--sm" style="border-radius:8px;">Edit Item</a>
+      <a href="{% url 'expense:recurring_item_delete' item.pk %}" class="btn btn--danger btn--sm" style="border-radius:8px;">Delete Item</a>
+    </div>
+  </div>
+
+  <!-- Detail Overview Panel -->
+  <div class="glass-panel" style="padding: 24px; animation: cardUp 0.6s var(--ease-out) 0.1s both; border-radius: 16px;">
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+          <span style="font-family: var(--font-heading); font-size: 20px; font-weight: 600; color: var(--text-primary);">{{ item.name }}</span>
+          {% if item.active %}
+            <span style="padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; background: rgba(52, 211, 153, 0.12); color: var(--accent-income); border: 1px solid rgba(52, 211, 153, 0.2);">ACTIVE</span>
+          {% else %}
+            <span style="padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; background: rgba(251, 113, 133, 0.12); color: var(--accent-expense); border: 1px solid rgba(251, 113, 133, 0.2);">PAUSED/COMPLETED</span>
+          {% endif %}
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text-secondary);">
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 4px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ item.category.color|default:'#7C9CFF' }}; display: inline-block;"></span>
+            {{ item.category.name|default:"Uncategorized" }}
+          </span>
+          <span>•</span>
+          <span style="text-transform: capitalize;">{{ item.get_type_display }}</span>
+          <span>•</span>
+          <span style="text-transform: capitalize;">{{ item.frequency }} billing</span>
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        <span style="display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 4px;">Billing Amount</span>
+        <span style="font-family: var(--font-heading); font-size: 24px; font-weight: 700; color: var(--accent-expense);">{{ item.amount|currency }}</span>
+      </div>
+    </div>
+
+    <!-- Stats and Progress Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px;">
+      
+      <div>
+        <span style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Start Date</span>
+        <span style="font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text-primary);">{{ item.start_date|date:"d M Y" }}</span>
+      </div>
+
+      <div>
+        <span style="display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;">Next Due Date</span>
+        <span style="font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--text-primary);">
+          {% if item.active %}{{ item.next_due_date|date:"d M Y" }}{% else %}—{% endif %}
+        </span>
+      </div>
+
+      {% if item.type == "emi" %}
+        <div style="grid-column: span 2;">
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">
+            <span>EMI Installment Progress</span>
+            <span style="color: var(--text-primary); font-weight: 600;">{{ item.installments_paid|default:0 }} / {{ item.total_installments|default:"∞" }} Paid</span>
+          </div>
+          <div class="category-bar" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+            {% if item.total_installments %}
+              {% widthratio item.installments_paid|default:0 item.total_installments 100 as pct %}
+              <div class="category-bar__fill" style="width: {{ pct }}%; background: linear-gradient(90deg, var(--accent-primary), var(--accent-income));"></div>
+            {% else %}
+              <div class="category-bar__fill" style="width: 100%; background: var(--accent-primary);"></div>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- Pay Cycles Checklist Section -->
+  <div class="glass-panel" style="padding: 24px; animation: cardUp 0.6s var(--ease-out) 0.2s both; border-radius: 16px;">
+    <h3 style="font-family: var(--font-heading); font-size: 14px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary);"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+      <span>Payment Checklist & History</span>
+    </h3>
+
+    <div class="table-container" style="background: transparent; border: none; box-shadow: none; margin-top: 0;">
+      <table class="data-table" style="background: transparent;">
+        <thead>
+          <tr>
+            <th style="padding-left: 8px;">Cycle Period</th>
+            <th>Due Date</th>
+            <th style="text-align: right;">Amount</th>
+            <th style="text-align: center;">Status</th>
+            <th>Paid Date</th>
+            <th>Linked Ledger</th>
+            <th style="text-align: right; padding-right: 8px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for payment in payments %}
+            <tr>
+              <td style="padding-left: 8px; font-weight: 600; color: var(--text-primary);">
+                {{ payment.period_label }}
+              </td>
+              <td style="font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);">
+                {{ payment.due_date|date:"d M Y" }}
+              </td>
+              <td style="font-family: var(--font-mono); font-size: 12px; text-align: right; font-weight: 600; color: var(--text-primary);">
+                {{ payment.amount|currency }}
+              </td>
+              <td style="text-align: center;">
+                {% if payment.paid %}
+                  <span style="display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; background: rgba(52, 211, 153, 0.12); color: var(--accent-income); border: 1px solid rgba(52, 211, 153, 0.2);">PAID</span>
+                {% else %}
+                  <span style="display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; background: rgba(251, 191, 36, 0.12); color: var(--accent-pending); border: 1px solid rgba(251, 191, 36, 0.2);">DUE</span>
+                {% endif %}
+              </td>
+              <td style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">
+                {{ payment.paid_date|date:"d M Y"|default:"—" }}
+              </td>
+              <td>
+                {% if payment.transaction %}
+                  <a href="{% url 'expense:transaction_update' payment.transaction.pk %}?next={{ request.path|urlencode }}" style="color: var(--accent-primary); text-decoration: underline; font-size: 12px;">
+                    View Txn
+                  </a>
+                {% else %}
+                  <span style="color: var(--text-muted);">—</span>
+                {% endif %}
+              </td>
+              <td style="text-align: right; padding-right: 8px;">
+                {% if payment.paid %}
+                  <a href="{% url 'expense:toggle_recurring_payment' payment.pk %}?next={{ request.path|urlencode }}" class="btn btn--secondary btn--sm" style="border-radius: 6px; font-size: 10px; padding: 3px 8px;">
+                    Mark Unpaid
+                  </a>
+                {% else %}
+                  <a href="{% url 'expense:toggle_recurring_payment' payment.pk %}?next={{ request.path|urlencode }}" class="btn btn--primary btn--sm" style="border-radius: 6px; font-size: 10px; padding: 3px 8px;">
+                    Pay Now
+                  </a>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 32px;">
+                No payment schedules generated.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

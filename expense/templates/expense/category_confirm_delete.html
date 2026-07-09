@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Category — My Finance{% endblock %}
+{% block page_title %}Delete Category{% endblock %}
+
+{% block content %}
+<div class="form-card" style="text-align: center; max-width: 500px;">
+  <div style="font-size: 48px; margin-bottom: 16px; color: var(--accent-expense);">⚠️</div>
+  <h3 style="font-family: var(--font-heading); font-size: 16px; font-weight: 600; margin-bottom: 12px;">Delete Category?</h3>
+  <p style="color: var(--text-secondary); margin-bottom: 24px;">Are you sure you want to delete the category <strong>"{{ object.name }}"</strong>? This category and its associations will be soft-deleted.</p>
+  
+  <form method="post">
+    {% csrf_token %}
+    <div style="display: flex; justify-content: center; gap: 12px;">
+      <a href="{% url 'expense:category_list' %}" class="btn btn--secondary">Cancel</a>
+      <button type="submit" class="btn btn--danger">Delete</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

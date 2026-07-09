@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Transactions — My Finance{% endblock %}
+{% block meta_description %}Manage your financial transactions, lent or borrowed amounts, and payment status.{% endblock %}
+
+{% block page_title %}Transactions{% endblock %}
+
+{% block content %}
+<!-- Search & Filters & Add Bar -->
+<div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; animation: cardUp 0.6s var(--ease-out) both;">
+  <!-- Search -->
+  <div class="header-search-wrapper" style="flex: 1; min-width: 180px; max-width: 250px; margin-top: 0; background: var(--glass-fill); border: 1px solid var(--glass-border); border-radius: 8px; height: 30px; display: flex; align-items: center; padding: 0 10px;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--text-secondary); margin-right: 6px; flex-shrink: 0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="transactionSearch" class="header-search-input" placeholder="Search contacts, reason..." autocomplete="off" style="font-size: 11px; background: transparent; border: none; outline: none; width: 100%; color: var(--text-primary);" />
+  </div>
+
+  <!-- Contact Filter -->
+  <select id="filterContact" style="max-width: 140px; height: 30px; border-radius: 8px; font-size: 11px; padding: 0 8px; background: var(--glass-fill); border: 1px solid var(--glass-border); color: var(--text-primary); outline: none;">
+    <option value="">All Contacts</option>
+    {% for contact in contacts %}
+      <option value="{{ contact.id }}">{{ contact.name }}</option>
+    {% endfor %}
+  </select>
+
+  <!-- Direction Filter -->
+  <select id="filterDirection" style="max-width: 120px; height: 30px; border-radius: 8px; font-size: 11px; padding: 0 8px; background: var(--glass-fill); border: 1px solid var(--glass-border); color: var(--text-primary); outline: none;">
+    <option value="">All Directions</option>
+    {% for val, label in directions %}
+      <option value="{{ val }}">{{ label }}</option>
+    {% endfor %}
+  </select>
+
+  <!-- Status Filter -->
+  <select id="filterStatus" style="max-width: 120px; height: 30px; border-radius: 8px; font-size: 11px; padding: 0 8px; background: var(--glass-fill); border: 1px solid var(--glass-border); color: var(--text-primary); outline: none; margin-right: auto;">
+    <option value="">All Statuses</option>
+    {% for val, label in statuses %}
+      <option value="{{ val }}">{{ label }}</option>
+    {% endfor %}
+  </select>
+
+  <!-- Add Button -->
+  <a href="{% url 'ledger:transaction_create' %}" class="btn btn--primary btn--sm" id="addTransactionBtn" style="flex-shrink: 0; border-radius: 8px; height: 30px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"></line><line x1="8" y1="12" x2="16" y2="12"></line>
+    </svg>
+    <span>Add Transaction</span>
+  </a>
+</div>
+
+<!-- Transactions Container -->
+<div id="transactionTableContainer" class="space-y-2" style="animation: cardUp 0.6s var(--ease-out) 0.1s both;">
+  <div class="glass-panel" style="padding: 48px; text-align: center; color: var(--text-secondary); border-radius: 16px;">
+    <span class="loader-spinner"></span>
+    <p style="margin-top: 8px;">Loading transactions...</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/ledger_transaction_list.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Categories — My Finance{% endblock %}
+{% block meta_description %}Manage expense categories with custom colors and labels.{% endblock %}
+
+{% block page_title %}Categories{% endblock %}
+
+{% block content %}
+<!-- Search & Add Bar -->
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 16px; animation: cardUp 0.6s var(--ease-out) both;">
+  <div class="header-search-wrapper" style="flex: 1; max-width: 300px; margin-right: auto; margin-top: 0; background: var(--glass-fill); border: 1px solid var(--glass-border); border-radius: 8px; height: 30px; display: flex; align-items: center; padding: 0 10px;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--text-secondary); margin-right: 6px; flex-shrink: 0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="categorySearch" class="header-search-input" placeholder="Search categories..." autocomplete="off" style="font-size: 11px; background: transparent; border: none; outline: none; width: 100%; color: var(--text-primary);" />
+  </div>
+  <a href="{% url 'expense:category_create' %}" class="btn btn--primary btn--sm" id="addCategoryBtn" style="flex-shrink: 0; border-radius: 8px; height: 30px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"></line><line x1="8" y1="12" x2="16" y2="12"></line>
+    </svg>
+    <span>Add Category</span>
+  </a>
+</div>
+
+<!-- Categories Table/List Container -->
+<div id="categoryTableContainer" class="space-y-2" style="animation: cardUp 0.6s var(--ease-out) 0.1s both;">
+  <div class="glass-panel" style="padding: 48px; text-align: center; color: var(--text-secondary); border-radius: 16px;">
+    <span class="loader-spinner"></span>
+    <p style="margin-top: 8px;">Loading categories...</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/category_list.js' %}"></script>
+{% endblock %}

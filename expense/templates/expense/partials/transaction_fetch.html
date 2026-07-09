@@ -1,0 +1,93 @@
+{% load custom_filters %}
+
+<div style="display: flex; align-items: center; gap: 24px; padding: 10px 16px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); border-bottom: 1px solid rgba(255, 255, 255, 0.06); margin-bottom: 12px; font-weight: 600;">
+  <!-- Date Column -->
+  <span class="sortable" data-sort="date" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 100px; flex-shrink: 0;">
+    Date
+    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+      {% if current_sort == "date" %}↑{% elif current_sort == "-date" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <!-- Category Column -->
+  <span class="sortable" data-sort="category" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 140px; flex-shrink: 0;">
+    Category
+    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+      {% if current_sort == "category" %}↑{% elif current_sort == "-category" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <!-- Note/Details Column -->
+  <span style="user-select: none; flex: 1; min-width: 0;">Note</span>
+
+  <!-- Amount Column -->
+  <span class="sortable" data-sort="amount" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 120px; flex-shrink: 0; justify-content: flex-end;">
+    Amount
+    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+      {% if current_sort == "amount" %}↑{% elif current_sort == "-amount" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <!-- Actions -->
+  <span style="width: 80px; text-align: right; user-select: none; flex-shrink: 0;">Actions</span>
+</div>
+
+<div class="transaction-list" style="display: flex; flex-direction: column; gap: 8px;">
+  {% for txn in page_obj %}
+    <div class="glass-panel group" style="display: flex; align-items: center; gap: 24px; padding: 10px 16px !important; border-radius: 12px !important; transition: all var(--transition-fast); background: var(--glass-fill); margin-bottom: 0;">
+      
+      <!-- Date -->
+      <div style="width: 100px; font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); flex-shrink: 0;">
+        {{ txn.date|date:"d M Y" }}
+      </div>
+
+      <!-- Category badge -->
+      <div style="width: 140px; flex-shrink: 0; display: flex; align-items: center;">
+        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 500; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); color: var(--text-primary);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ txn.category.color|default:'#7C9CFF' }}; display: inline-block;"></span>
+          {{ txn.category.name|default:"Uncategorized" }}
+        </span>
+      </div>
+
+      <!-- Note -->
+      <div style="flex: 1; min-width: 0; font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+        {{ txn.note|default:"—" }}
+        {% if txn.recurring_payment %}
+          <span style="font-size: 9px; padding: 1px 4px; border-radius: 4px; background: rgba(124, 156, 255, 0.1); border: 1px solid rgba(124, 156, 255, 0.15); color: var(--accent-primary); margin-left: 6px; font-family: var(--font-mono);">Recurring</span>
+        {% endif %}
+      </div>
+
+      <!-- Amount -->
+      <div style="width: 120px; text-align: right; font-family: var(--font-mono); font-weight: 600; font-size: 13px; flex-shrink: 0;">
+        {% if txn.type == "income" %}
+          <span style="color: var(--accent-income);">+{{ txn.amount|currency }}</span>
+        {% else %}
+          <span style="color: var(--accent-expense);">-{{ txn.amount|currency }}</span>
+        {% endif %}
+      </div>
+
+      <!-- Actions -->
+      <div style="display: inline-flex; gap: 6px; justify-content: flex-end; align-items: center; flex-shrink: 0; width: 80px;">
+        <a href="{% url 'expense:transaction_update' txn.pk %}" class="btn btn--secondary btn--sm btn--icon" title="Edit Transaction" style="padding: 0; border-radius: 8px; border: 1px solid var(--glass-border); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--glass-fill);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+        </a>
+        <a href="{% url 'expense:transaction_delete' txn.pk %}" class="btn btn--danger btn--sm btn--icon" title="Delete Transaction" style="padding: 0; border-radius: 8px; border: 1px solid rgba(251, 113, 133, 0.15); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--glass-fill);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+        </a>
+      </div>
+    </div>
+  {% empty %}
+    <div class="glass-panel" style="text-align: center; padding: 48px; color: var(--text-secondary); border-radius: 12px !important;">
+      <div style="margin-bottom: 12px; font-size: 24px;">💸</div>
+      <p>No transactions found matching the criteria.</p>
+    </div>
+  {% endfor %}
+</div>

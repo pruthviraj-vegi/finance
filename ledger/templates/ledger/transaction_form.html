@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+  {% if is_create %}Add New Transaction{% else %}Edit Transaction{% endif %} — My Finance
+{% endblock %}
+
+{% block meta_description %}Record or update a lending or borrowing transaction.{% endblock %}
+
+{% block page_title %}
+  {% if is_create %}Add New Transaction{% else %}Edit Transaction{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="form-card" style="animation: cardUp 0.6s var(--ease-out) both;">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if next_url %}
+      <input type="hidden" name="next" value="{{ next_url }}">
+    {% endif %}
+    
+    <!-- Non-field errors -->
+    {% if form.non_field_errors %}
+      <div class="alert alert--error" role="alert" style="margin-bottom: 20px;">
+        {% for error in form.non_field_errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Contact Field -->
+    <div class="form-group">
+      <label for="{{ form.contact.id_for_label }}" class="form-label">Contact *</label>
+      {{ form.contact }}
+      {% if form.contact.errors %}
+        <span class="form-error">{{ form.contact.errors.0 }}</span>
+      {% endif %}
+      <div style="margin-top: 4px; font-size: 11px; color: var(--text-muted);">
+        Can't find the contact? <a href="{% url 'ledger:contact_create' %}" style="color: var(--accent-primary); text-decoration: underline;">Create a new contact first</a>.
+      </div>
+    </div>
+
+    <!-- Direction Field -->
+    <div class="form-group">
+      <label for="{{ form.direction.id_for_label }}" class="form-label">Direction *</label>
+      {{ form.direction }}
+      {% if form.direction.errors %}
+        <span class="form-error">{{ form.direction.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Amount Field -->
+    <div class="form-group">
+      <label for="{{ form.amount.id_for_label }}" class="form-label">Amount (₹) *</label>
+      {{ form.amount }}
+      {% if form.amount.errors %}
+        <span class="form-error">{{ form.amount.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Date Field -->
+    <div class="form-group">
+      <label for="{{ form.date.id_for_label }}" class="form-label">Date *</label>
+      {{ form.date }}
+      {% if form.date.errors %}
+        <span class="form-error">{{ form.date.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Reason Field -->
+    <div class="form-group">
+      <label for="{{ form.reason.id_for_label }}" class="form-label">Reason / Description</label>
+      {{ form.reason }}
+      {% if form.reason.errors %}
+        <span class="form-error">{{ form.reason.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Due Date Field -->
+    <div class="form-group">
+      <label for="{{ form.due_date.id_for_label }}" class="form-label">Due Date (Optional)</label>
+      {{ form.due_date }}
+      {% if form.due_date.errors %}
+        <span class="form-error">{{ form.due_date.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <a href="{% if next_url %}{{ next_url }}{% else %}{% url 'ledger:transaction_list' %}{% endif %}" class="btn btn--secondary">Cancel</a>
+      <button type="submit" class="btn btn--primary">
+        {% if is_create %}Record Transaction{% else %}Save Changes{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

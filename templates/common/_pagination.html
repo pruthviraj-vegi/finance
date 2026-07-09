@@ -1,0 +1,29 @@
+<div class="pagination">
+  <div class="pagination__info">
+    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ total_count }} entries
+  </div>
+  <div class="pagination__pages">
+    <!-- Previous button -->
+    <button class="pagination__btn" 
+            {% if page_obj.has_previous %}data-page="{{ page_obj.previous_page_number }}"{% else %}disabled{% endif %} 
+            aria-label="Previous page">
+      &larr;
+    </button>
+
+    <!-- Page Numbers -->
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <button class="pagination__btn pagination__btn--active" data-page="{{ num }}">{{ num }}</button>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <button class="pagination__btn" data-page="{{ num }}">{{ num }}</button>
+      {% endif %}
+    {% endfor %}
+
+    <!-- Next button -->
+    <button class="pagination__btn" 
+            {% if page_obj.has_next %}data-page="{{ page_obj.next_page_number }}"{% else %}disabled{% endif %} 
+            aria-label="Next page">
+      &rarr;
+    </button>
+  </div>
+</div>
