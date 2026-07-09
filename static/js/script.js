@@ -21,6 +21,7 @@ function initSidebar() {
   const overlay = document.getElementById('sidebarOverlay');
   const toggle = document.getElementById('sidebarToggle');
   const close = document.getElementById('sidebarClose');
+  const collapseBtn = document.getElementById('sidebarCollapseBtn');
   if (!sidebar) return;
 
   function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('active'); }
@@ -29,6 +30,20 @@ function initSidebar() {
   if (toggle) toggle.addEventListener('click', openSidebar);
   if (close) close.addEventListener('click', closeSidebar);
   if (overlay) overlay.addEventListener('click', closeSidebar);
+
+  // Desktop Collapse Toggle logic
+  if (collapseBtn) {
+    // Restore state from localStorage
+    const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+    if (isCollapsed) {
+      document.body.classList.add('sidebar-collapsed');
+    }
+
+    collapseBtn.addEventListener('click', () => {
+      const currentlyCollapsed = document.body.classList.toggle('sidebar-collapsed');
+      localStorage.setItem('sidebar-collapsed', currentlyCollapsed);
+    });
+  }
 }
 
 /* ============================================

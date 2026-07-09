@@ -78,13 +78,158 @@ input { font-family:inherit; border:none; background:none; color:inherit; outlin
 .nav-item--active svg { color:var(--accent-primary); }
 .nav-item--logout { color:var(--accent-expense); }
 .nav-item--logout:hover { background:rgba(251,113,133,0.1); }
+.nav-icon { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
 .sidebar__footer { padding:12px; border-top:1px solid var(--glass-border); }
-.sidebar__user { display:flex; align-items:center; gap:12px; padding:8px 12px; margin-bottom:8px; }
+.sidebar__user { display:flex; align-items:center; gap:12px; padding:8px 12px; margin-bottom:0; }
 .sidebar__avatar { width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg,var(--accent-primary),var(--accent-income)); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; color:#0B0E14; flex-shrink:0; }
 .sidebar__user-info { flex:1; overflow:hidden; }
 .sidebar__user-name { display:block; font-size:12px; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .sidebar__user-role { display:block; font-size:11px; color:var(--text-muted); font-family:var(--font-mono); }
 .sidebar__overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:99; }
+
+/* ============================================
+   Sidebar Collapse System
+   ============================================ */
+.sidebar__collapse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  padding: 6px;
+  border-radius: 8px;
+  transition: all var(--transition-fast);
+}
+.sidebar__collapse-btn:hover {
+  color: var(--text-primary);
+  background: var(--glass-fill);
+}
+.collapse-icon {
+  transition: transform var(--transition-base);
+}
+
+.sidebar {
+  transition: transform var(--transition-base), width var(--transition-base), box-shadow var(--transition-base);
+}
+
+@media (min-width: 1025px) {
+  body.sidebar-collapsed {
+    --sidebar-width: 76px;
+  }
+  
+  body.sidebar-collapsed .sidebar {
+    width: 76px;
+  }
+  
+  body.sidebar-collapsed .sidebar__nav {
+    overflow: visible;
+  }
+  
+  body.sidebar-collapsed .sidebar .sidebar__brand,
+  body.sidebar-collapsed .sidebar .sidebar__brand-name,
+  body.sidebar-collapsed .sidebar .sidebar__brand-tagline,
+  body.sidebar-collapsed .sidebar .nav-section__label,
+  body.sidebar-collapsed .sidebar .nav-item span,
+  body.sidebar-collapsed .sidebar .sidebar__user-info,
+  body.sidebar-collapsed .sidebar .sidebar__logo {
+    opacity: 0;
+    visibility: hidden;
+    white-space: nowrap;
+    width: 0;
+    margin: 0;
+    padding: 0;
+    display: none !important;
+  }
+
+  body.sidebar-collapsed .sidebar .sidebar__header {
+    justify-content: center;
+    padding: 20px 0 16px;
+  }
+
+  body.sidebar-collapsed .sidebar .sidebar__collapse-btn {
+    margin: 0 auto;
+    display: flex !important;
+  }
+
+  body.sidebar-collapsed .sidebar .nav-item {
+    justify-content: center;
+    padding: 10px 0;
+  }
+  
+  body.sidebar-collapsed .sidebar .sidebar__user {
+    justify-content: center;
+    padding: 8px 0;
+    margin-bottom: 0;
+  }
+
+  body.sidebar-collapsed .sidebar__collapse-btn svg {
+    transform: rotate(180deg);
+  }
+
+  /* CSS Tooltips for Collapsed Sidebar */
+  body.sidebar-collapsed .nav-item,
+  body.sidebar-collapsed .sidebar__user {
+    position: relative;
+  }
+
+  body.sidebar-collapsed .nav-item::after,
+  body.sidebar-collapsed .sidebar__user::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%) translateX(10px);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  body.sidebar-collapsed .nav-item::before {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%) translateX(4px);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent var(--glass-border) transparent transparent;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  body.sidebar-collapsed .nav-item:hover::after,
+  body.sidebar-collapsed .sidebar__user:hover::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(14px);
+  }
+
+  body.sidebar-collapsed .nav-item:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(8px);
+  }
+}
+
+@media (max-width: 1024px) {
+  .sidebar__collapse-btn {
+    display: none !important;
+  }
+}
+
 
 /* ============================================
    Topbar
@@ -913,4 +1058,138 @@ input { font-family:inherit; border:none; background:none; color:inherit; outlin
   font-feature-settings: 'liga';
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
 }
+
+/* ============================================
+   Centralized Table & Filter Bar Components
+   (Eliminating duplicate inline styles in list pages)
+   ============================================ */
+
+/* Small Search Input Wrapper (30px height, 8px border-radius) */
+.search-wrapper--sm {
+  display: flex;
+  align-items: center;
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  height: 30px;
+  padding: 0 10px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.search-wrapper--sm:focus-within {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(124, 156, 255, 0.12);
+}
+.search-wrapper--sm svg {
+  color: var(--text-secondary);
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+.search-wrapper--sm input {
+  font-size: 11px;
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: var(--text-primary);
+}
+.search-wrapper--sm input::placeholder {
+  color: var(--text-muted);
+}
+
+/* Compact Select Filters (used alongside small search input) */
+.form-select--sm {
+  height: 30px;
+  padding: 0 28px 0 10px;
+  font-size: 11px;
+  border-radius: 8px;
+  background-position: right 8px center;
+  background-color: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  outline: none;
+}
+
+/* Compact Action Buttons */
+.btn--compact {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 11px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Table Row Action Icons (Edit / Delete / View details in row) */
+.btn-action {
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--glass-fill);
+  transition: all var(--transition-fast);
+}
+.btn-action--secondary {
+  color: var(--text-secondary);
+}
+.btn-action--secondary:hover {
+  background: var(--glass-fill-hover);
+  border-color: var(--glass-border-hover);
+  color: var(--text-primary);
+}
+.btn-action--info {
+  color: var(--accent-primary);
+}
+.btn-action--info:hover {
+  background: var(--glass-fill-hover);
+  border-color: var(--glass-border-hover);
+}
+.btn-action--danger {
+  border-color: rgba(251, 113, 133, 0.15);
+  color: var(--accent-expense);
+}
+.btn-action--danger:hover {
+  background: rgba(251, 113, 133, 0.2);
+  border-color: var(--accent-expense);
+  box-shadow: 0 4px 12px rgba(251, 113, 133, 0.2);
+}
+
+/* Flex Table Header Row */
+.flex-table-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 10px 16px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* Flex Table Data Row */
+.flex-table-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 10px 16px !important;
+  border-radius: 12px !important;
+  transition: all var(--transition-fast);
+  background: var(--glass-fill);
+  margin-bottom: 0;
+}
+.flex-table-row:hover {
+  background: var(--glass-fill-hover);
+  border-color: var(--glass-border-hover);
+}
+
 

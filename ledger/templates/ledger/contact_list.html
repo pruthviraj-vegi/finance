@@ -8,18 +8,18 @@
 
 {% block content %}
 <!-- Search & Add Bar -->
-<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 16px; animation: cardUp 0.6s var(--ease-out) both;">
-  <div class="header-search-wrapper" style="flex: 1; max-width: 300px; margin-right: auto; margin-top: 0; background: var(--glass-fill); border: 1px solid var(--glass-border); border-radius: 8px; height: 30px; display: flex; align-items: center; padding: 0 10px;">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--text-secondary); margin-right: 6px; flex-shrink: 0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="contactSearch" class="header-search-input" placeholder="Search contacts..." autocomplete="off" style="font-size: 11px; background: transparent; border: none; outline: none; width: 100%; color: var(--text-primary);" />
+<form id="contactFilterForm" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 16px; animation: cardUp 0.6s var(--ease-out) both;">
+  <div class="search-wrapper--sm" style="flex: 1; max-width: 300px; margin-right: auto;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="contactSearch" name="search" placeholder="Search contacts..." autocomplete="off" />
   </div>
-  <a href="{% url 'ledger:contact_create' %}" class="btn btn--primary btn--sm" id="addContactBtn" style="flex-shrink: 0; border-radius: 8px; height: 30px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px;">
+  <a href="{% url 'ledger:contact_create' %}" class="btn btn--primary btn--compact" id="addContactBtn">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <line x1="12" y1="5" x2="12" y2="19"></line><line x1="8" y1="12" x2="16" y2="12"></line>
     </svg>
     <span>Add Contact</span>
   </a>
-</div>
+</form>
 
 <!-- Contacts Container -->
 <div id="contactTableContainer" class="space-y-2" style="animation: cardUp 0.6s var(--ease-out) 0.1s both;">
@@ -31,5 +31,30 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/pages/contact_list.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const containerId = "contactTableContainer";
+    const formId = "contactFilterForm";
+    const fetchUrl = "{% url 'ledger:contact_fetch' %}";
+
+    // Initialize AJAX Table with filters and sorting
+    initTableAjax(
+      formId,
+      containerId,
+      fetchUrl,
+      {
+        autoLoad: true,
+        sortable: true,
+        inlinePagination: true,
+        defaultParams: {
+          sort: "name"
+        }
+      },
+      true // Include text inputs for debounced search as user types
+    );
+
+    // Initialize event delegation for column sorting
+    initTableSorting(containerId);
+  });
+</script>
 {% endblock %}

@@ -8,17 +8,17 @@
 
 {% block content %}
 <!-- Search & Filters Bar -->
-<div class="filter-bar" style="animation: cardUp 0.6s var(--ease-out) both;">
+<form id="transactionFilterForm" class="filter-bar" style="animation: cardUp 0.6s var(--ease-out) both;">
   <div style="display: flex; gap: 12px; flex-wrap: wrap; flex: 1; align-items: center;">
     
     <!-- Search Input -->
-    <div class="header-search-wrapper" style="max-width: 260px; background: var(--glass-fill); border: 1px solid var(--glass-border); border-radius: 8px; height: 30px; display: flex; align-items: center; padding: 0 10px;">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--text-secondary); margin-right: 6px; flex-shrink: 0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="transactionSearch" class="header-search-input" placeholder="Search transactions..." autocomplete="off" style="font-size: 11px; background: transparent; border: none; outline: none; width: 100%; color: var(--text-primary);" />
+    <div class="search-wrapper--sm" style="max-width: 260px; flex: 1;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="transactionSearch" name="search" placeholder="Search transactions..." autocomplete="off" />
     </div>
 
     <!-- Type Filter Dropdown -->
-    <select id="typeFilter" class="form-select" style="width: auto; height: 30px; padding: 4px 28px 4px 10px; font-size: 11px; border-radius: 8px; background-position: right 8px center;">
+    <select id="typeFilter" name="type" class="form-select form-select--sm" style="width: auto;">
       <option value="">All Types</option>
       {% for code, name in types %}
         <option value="{{ code }}">{{ name }}</option>
@@ -26,7 +26,7 @@
     </select>
 
     <!-- Category Filter Dropdown -->
-    <select id="categoryFilter" class="form-select" style="width: auto; height: 30px; padding: 4px 28px 4px 10px; font-size: 11px; border-radius: 8px; background-position: right 8px center;">
+    <select id="categoryFilter" name="category" class="form-select form-select--sm" style="width: auto;">
       <option value="">All Categories</option>
       {% for category in categories %}
         <option value="{{ category.pk }}">{{ category.name }}</option>
@@ -35,13 +35,13 @@
 
   </div>
 
-  <a href="{% url 'expense:transaction_create' %}" class="btn btn--primary btn--sm" id="addTransactionBtn" style="flex-shrink: 0; border-radius: 8px; height: 30px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px;">
+  <a href="{% url 'expense:transaction_create' %}" class="btn btn--primary btn--compact" id="addTransactionBtn">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <line x1="12" y1="5" x2="12" y2="19"></line><line x1="8" y1="12" x2="16" y2="12"></line>
     </svg>
     <span>Add Transaction</span>
   </a>
-</div>
+</form>
 
 <!-- Transactions Table Container -->
 <div id="transactionTableContainer" class="space-y-2" style="animation: cardUp 0.6s var(--ease-out) 0.1s both;">
@@ -53,5 +53,30 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/pages/expense_transaction_list.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const containerId = "transactionTableContainer";
+    const formId = "transactionFilterForm";
+    const fetchUrl = "{% url 'expense:fetch_transactions' %}";
+
+    // Initialize AJAX Table with filters and sorting
+    initTableAjax(
+      formId,
+      containerId,
+      fetchUrl,
+      {
+        autoLoad: true,
+        sortable: true,
+        inlinePagination: true,
+        defaultParams: {
+          sort: "-date"
+        }
+      },
+      true // Include text inputs for debounced search as user types
+    );
+
+    // Initialize event delegation for column sorting
+    initTableSorting(containerId);
+  });
+</script>
 {% endblock %}
