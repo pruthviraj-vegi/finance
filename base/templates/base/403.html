@@ -1,23 +1,21 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Access Denied — 403 — My Finace{% endblock %}
-{% block meta_description %}You do not have permission to access this page.{% endblock %}
-
+{% block title %}Forbidden — My Finance{% endblock %}
 {% block page_title %}Access Denied{% endblock %}
 
 {% block content %}
-<div class="form-card" style="animation: cardUp 0.6s var(--ease-out) both; max-width: 500px; text-align: center;">
-  <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(251, 113, 133, 0.1); color: var(--accent-expense); display: inline-flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px; margin-left: auto; margin-right: auto;">
-    🔒
+<div class="form-card" style="text-align: center; max-width: 500px; animation: cardUp 0.6s var(--ease-out) both;">
+  <div class="text-28" style="width: 64px; height: 64px; border-radius: 50%; background: rgba(251, 113, 133, 0.1); color: var(--accent-expense); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; margin-left: auto; margin-right: auto;">
+    ⚠️
   </div>
-  <h2 style="font-family: var(--font-heading); font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">Permission Required</h2>
-  <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5; margin-bottom: 24px;">
-    You do not have the required permissions to view or modify this page. If you believe this is an error, please contact your administrator.
+  <h2 class="text-20" style="font-family: var(--font-heading); font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">Permission Required</h2>
+  <p class="text-14" style="color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px;">
+    You do not have permission to access this area, this area is for admins.
   </p>
+
   <div style="display: flex; justify-content: center; gap: 12px;">
-    <a href="javascript:history.back()" class="btn btn--secondary">Go Back</a>
-    <a href="{% url 'base:home' %}" class="btn btn--primary">Go to Dashboard</a>
+    <a href="{% url 'base:home' %}" class="btn btn--primary">Return to Dashboard</a>
   </div>
 </div>
 {% endblock %}

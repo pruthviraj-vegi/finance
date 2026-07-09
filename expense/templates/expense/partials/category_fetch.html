@@ -1,47 +1,37 @@
 <div class="flex-table-header">
-  <!-- Color Indicator Column -->
   <div style="width: 24px; margin-right: 12px; flex-shrink: 0;"></div>
   
-  <!-- Category Name -->
-  <span class="sortable" data-sort="name" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 250px; flex-shrink: 0;">
+  <span class="sortable-col" data-sort="name" style="width: 250px;">
     Category Name
-    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+    <span class="sort-arrow">
       {% if current_sort == "name" %}↑{% elif current_sort == "-name" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <!-- Created At -->
-  <span class="sortable hidden sm:inline" data-sort="created_at" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; flex: 1; justify-content: flex-end; margin-right: 24px;">
+  <span class="sortable-col hidden sm:inline" data-sort="created_at" style="flex: 1; justify-content: flex-end; margin-right: 24px;">
     Created At
-    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+    <span class="sort-arrow">
       {% if current_sort == "created_at" %}↑{% elif current_sort == "-created_at" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <!-- Actions -->
   <span style="width: 100px; text-align: right; user-select: none; flex-shrink: 0;">Actions</span>
 </div>
 
-<div class="category-list" style="display: flex; flex-direction: column; gap: 8px;">
+<div class="table-rows">
   {% for category in page_obj %}
     <div class="glass-panel group flex-table-row">
-      <!-- Color Indicator -->
-      <div style="width: 24px; height: 24px; border-radius: 50%; background-color: {{ category.color|default:'#7C9CFF' }}; margin-right: 12px; flex-shrink: 0; box-shadow: 0 0 10px {{ category.color|default:'#7C9CFF' }}44;"></div>
+      <div class="color-dot" style="background-color: {{ category.color|default:'#7C9CFF' }}; box-shadow: 0 0 10px {{ category.color|default:'#7C9CFF' }}44;"></div>
 
-      <!-- Category Name -->
-      <div style="width: 250px; min-width: 0; flex-shrink: 0;">
-        <p style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0;">
-          {{ category.name }}
-        </p>
+      <div class="row-cell" style="width: 250px; min-width: 0;">
+        <p class="text-13" style="font-weight: 600; color: var(--text-primary); margin: 0;">{{ category.name }}</p>
       </div>
 
-      <!-- Created Date -->
-      <div class="hidden sm:block" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); text-align: right; flex: 1; margin-right: 24px;">
+      <div class="hidden sm:block row-cell font-mono-date" style="flex: 1; text-align: right; margin-right: 24px;">
         {{ category.created_at|date:"d M Y" }}
       </div>
 
-      <!-- Actions -->
-      <div style="display: inline-flex; gap: 6px; justify-content: flex-end; align-items: center; flex-shrink: 0; width: 100px;">
+      <div class="table-actions" style="width: 100px;">
         <a href="{% url 'expense:category_update' category.pk %}" class="btn btn-action btn-action--secondary" title="Edit Category">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
             <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
@@ -59,8 +49,8 @@
       </div>
     </div>
   {% empty %}
-    <div class="glass-panel" style="text-align: center; padding: 48px; color: var(--text-secondary); border-radius: 12px !important;">
-      <div style="margin-bottom: 12px; font-size: 24px;">🏷️</div>
+    <div class="empty-state">
+      <div class="empty-state__icon">🏷️</div>
       <p>No categories found. Click 'Add Category' to create one.</p>
     </div>
   {% endfor %}

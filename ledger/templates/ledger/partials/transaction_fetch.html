@@ -1,74 +1,57 @@
 {% load custom_filters %}
 <div class="flex-table-header">
-  <!-- Spacer for Avatar -->
   <div style="width: 32px; margin-right: 12px; flex-shrink: 0;"></div>
   
-  <!-- Contact -->
-  <span class="sortable" data-sort="contact" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 150px; flex-shrink: 0;">
+  <span class="sortable-col" data-sort="contact" style="width: 150px;">
     Contact
-    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+    <span class="sort-arrow">
       {% if current_sort == "contact" %}↑{% elif current_sort == "-contact" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <!-- Direction -->
-  <span class="sortable" data-sort="direction" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 100px; flex-shrink: 0;">
+  <span class="sortable-col" data-sort="direction" style="width: 100px;">
     Direction
-    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+    <span class="sort-arrow">
       {% if current_sort == "direction" %}↑{% elif current_sort == "-direction" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <!-- Amount -->
-  <span class="sortable" data-sort="amount" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 120px; flex-shrink: 0;">
+  <span class="sortable-col" data-sort="amount" style="width: 120px;">
     Amount
-    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+    <span class="sort-arrow">
       {% if current_sort == "amount" %}↑{% elif current_sort == "-amount" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <!-- Date -->
-  <span class="sortable" data-sort="date" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 110px; flex-shrink: 0;">
+  <span class="sortable-col" data-sort="date" style="width: 110px;">
     Date
-    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+    <span class="sort-arrow">
       {% if current_sort == "date" %}↑{% elif current_sort == "-date" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <!-- Reason -->
-  <span class="hidden md:inline" style="user-select: none; flex: 1; min-width: 0;">Reason</span>
+  <span class="hidden md:inline row-cell--fluid" style="user-select: none;">Reason</span>
 
-  <!-- Status -->
-  <span class="sortable" data-sort="status" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 100px; flex-shrink: 0;">
+  <span class="sortable-col" data-sort="status" style="width: 100px;">
     Status
-    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+    <span class="sort-arrow">
       {% if current_sort == "status" %}↑{% elif current_sort == "-status" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <!-- Actions -->
   <span style="width: 70px; text-align: right; user-select: none; flex-shrink: 0;">Actions</span>
 </div>
 
-<div class="transaction-list" style="display: flex; flex-direction: column; gap: 8px;">
+<div class="table-rows">
   {% for transaction in page_obj %}
     <div class="glass-panel group flex-table-row">
-      <!-- Avatar / Direction Icon -->
-      <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; transition: transform var(--transition-fast);
+      <div class="avatar-circle {% if transaction.direction == 'given' %}avatar-circle--income{% else %}avatar-circle--expense{% endif %}">
         {% if transaction.direction == 'given' %}
-          background: rgba(52, 211, 153, 0.08); border: 1px solid rgba(52, 211, 153, 0.15); color: var(--accent-income);
-        {% else %}
-          background: rgba(251, 113, 133, 0.08); border: 1px solid rgba(251, 113, 133, 0.15); color: var(--accent-expense);
-        {% endif %}
-      " class="group-hover-scale">
-        {% if transaction.direction == 'given' %}
-          <!-- Arrow Up Right (Lent) -->
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="7" y1="17" x2="17" y2="7"></line>
             <polyline points="7 7 17 7 17 17"></polyline>
           </svg>
         {% else %}
-          <!-- Arrow Down Left (Borrowed) -->
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="17" y1="7" x2="7" y2="17"></line>
             <polyline points="17 17 7 17 7 7"></polyline>
@@ -76,48 +59,41 @@
         {% endif %}
       </div>
 
-      <!-- Contact Name -->
-      <div style="width: 150px; min-width: 0; flex-shrink: 0;">
-        <p style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ transaction.contact.name }}</p>
+      <div class="row-cell" style="width: 150px; min-width: 0;">
+        <p class="text-ellipsis-block text-13" style="font-weight: 600; color: var(--text-primary); margin: 0;">{{ transaction.contact.name }}</p>
       </div>
 
-      <!-- Direction Label -->
-      <div style="width: 100px; font-size: 12px; flex-shrink: 0;">
+      <div class="row-cell text-12" style="width: 100px;">
         {% if transaction.direction == 'given' %}
-          <span style="color: var(--accent-income); font-weight: 500;">Lent</span>
+          <span class="text-accent-income" style="font-weight: 500;">Lent</span>
         {% else %}
-          <span style="color: var(--accent-expense); font-weight: 500;">Borrowed</span>
+          <span class="text-accent-expense" style="font-weight: 500;">Borrowed</span>
         {% endif %}
       </div>
 
-      <!-- Amount -->
-      <div style="width: 120px; font-family: var(--font-mono); font-weight: 600; font-size: 13px; color: var(--text-primary); flex-shrink: 0;">
+      <div class="row-cell font-mono-amount" style="width: 120px; color: var(--text-primary);">
         {{ transaction.amount|currency }}
       </div>
 
-      <!-- Date -->
-      <div style="width: 110px; font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); flex-shrink: 0;">
+      <div class="row-cell font-mono-date" style="width: 110px;">
         {{ transaction.date|date:"d M Y" }}
       </div>
 
-      <!-- Reason -->
-      <div class="hidden md:block" style="flex: 1; min-width: 0; font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+      <div class="hidden md:block row-cell--fluid text-ellipsis text-12" style="color: var(--text-secondary);">
         {{ transaction.reason|default:"—" }}
       </div>
 
-      <!-- Status Badge -->
-      <div style="width: 100px; display: flex; align-items: center; flex-shrink: 0;">
+      <div class="row-cell" style="width: 100px; display: flex; align-items: center;">
         {% if transaction.status == 'settled' %}
-          <span style="font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.2); color: var(--accent-income); font-weight: 500;">Settled</span>
+          <span class="status-badge status-badge--settled">Settled</span>
         {% elif transaction.status == 'partially_settled' %}
-          <span style="font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.2); color: #F59E0B; font-weight: 500;">Partial</span>
+          <span class="status-badge status-badge--partial">Partial</span>
         {% else %}
-          <span style="font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-secondary); font-weight: 500;">Open</span>
+          <span class="status-badge status-badge--open">Open</span>
         {% endif %}
       </div>
 
-      <!-- Actions -->
-      <div style="width: 70px; display: inline-flex; gap: 6px; justify-content: flex-end; align-items: center; flex-shrink: 0;">
+      <div class="table-actions" style="width: 70px;">
         <a href="{% url 'ledger:transaction_update' transaction.pk %}" class="btn btn-action btn-action--secondary" title="Edit Transaction">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
             <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
@@ -135,8 +111,8 @@
       </div>
     </div>
   {% empty %}
-    <div class="glass-panel" style="text-align: center; padding: 48px; color: var(--text-secondary); border-radius: 12px !important;">
-      <div style="margin-bottom: 12px; font-size: 24px;">💸</div>
+    <div class="empty-state">
+      <div class="empty-state__icon">💸</div>
       <p>No transactions found matching the criteria.</p>
     </div>
   {% endfor %}

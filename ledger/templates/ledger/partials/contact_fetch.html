@@ -1,90 +1,72 @@
 {% load custom_filters %}
 <div class="flex-table-header">
-  <!-- Spacer for Avatar -->
   <div style="width: 32px; margin-right: 12px; flex-shrink: 0;"></div>
   
-  <!-- Name -->
-  <span class="sortable" data-sort="name" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 180px; flex-shrink: 0;">
+  <span class="sortable-col" data-sort="name" style="width: 180px;">
     Name
-    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+    <span class="sort-arrow">
       {% if current_sort == "name" %}↑{% elif current_sort == "-name" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <!-- Phone Number -->
-  <span class="sortable" data-sort="phone_number" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 120px; flex-shrink: 0;">
+  <span class="sortable-col" data-sort="phone_number" style="width: 120px;">
     Phone Number
-    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+    <span class="sort-arrow">
       {% if current_sort == "phone_number" %}↑{% elif current_sort == "-phone_number" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <!-- Amount -->
   <span style="width: 120px; user-select: none; flex-shrink: 0;">Amount</span>
 
-  <!-- Notes -->
-  <span class="hidden md:inline" style="user-select: none; flex: 1; min-width: 0;">Notes</span>
+  <span class="hidden md:inline row-cell--fluid" style="user-select: none;">Notes</span>
 
-  <!-- Created At -->
-  <span class="sortable hidden sm:inline" data-sort="created_at" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px; user-select: none; width: 100px; flex-shrink: 0; justify-content: flex-end;">
+  <span class="sortable-col hidden sm:inline" data-sort="created_at" style="width: 100px; justify-content: flex-end;">
     Created At
-    <span class="sort-icon" style="font-size: 9px; opacity: 0.7;">
+    <span class="sort-arrow">
       {% if current_sort == "created_at" %}↑{% elif current_sort == "-created_at" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <!-- Actions -->
   <span style="width: 100px; text-align: right; user-select: none; flex-shrink: 0;">Actions</span>
 </div>
 
-<div class="contact-list" style="display: flex; flex-direction: column; gap: 8px;">
+<div class="table-rows">
   {% for contact in page_obj %}
     <div class="glass-panel group flex-table-row">
-      <!-- Avatar Icon -->
-      <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(124, 156, 255, 0.08); border: 1px solid rgba(124, 156, 255, 0.15); display: flex; align-items: center; justify-content: center; color: var(--accent-primary); margin-right: 12px; flex-shrink: 0; transition: transform var(--transition-fast);" class="group-hover-scale">
+      <div class="avatar-circle avatar-circle--primary">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
       </div>
 
-      <!-- Name -->
-      <div style="width: 180px; min-width: 0; flex-shrink: 0;">
-        <p style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-          <a href="{% url 'ledger:contact_detail' contact.pk %}" style="color: inherit; text-decoration: none;" onmouseover="this.style.color='var(--accent-primary)';" onmouseout="this.style.color='inherit';">{{ contact.name }}</a>
-        </p>
+      <div class="row-cell" style="width: 180px; min-width: 0;">
+        <a href="{% url 'ledger:contact_detail' contact.pk %}" class="nav-link-hover text-ellipsis-block text-13" style="font-weight: 600; color: var(--text-primary); margin: 0;">{{ contact.name }}</a>
       </div>
 
-      <!-- Phone Number -->
-      <div style="width: 120px; min-width: 0; flex-shrink: 0;">
-        <p style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-          {{ contact.phone_number|default:"—" }}
-        </p>
+      <div class="row-cell" style="width: 120px; min-width: 0;">
+        <p class="text-ellipsis-block text-11" style="color: var(--text-muted); font-family: var(--font-mono); margin: 0;">{{ contact.phone_number|default:"—" }}</p>
       </div>
 
-      <!-- Net Balance / Amount -->
-      <div style="width: 120px; font-family: var(--font-mono); font-weight: 600; font-size: 13px; flex-shrink: 0;">
+      <div class="row-cell font-mono-amount" style="width: 120px;">
         {% if contact.net_balance > 0 %}
-          <span style="color: var(--accent-income);">+{{ contact.net_balance|currency }}</span>
+          <span class="text-accent-income">+{{ contact.net_balance|currency }}</span>
         {% elif contact.net_balance < 0 %}
-          <span style="color: var(--accent-expense);">{{ contact.net_balance|currency }}</span>
+          <span class="text-accent-expense">{{ contact.net_balance|currency }}</span>
         {% else %}
           <span style="color: var(--text-muted);">0.00</span>
         {% endif %}
       </div>
 
-      <!-- Notes -->
-      <div class="hidden md:block" style="flex: 1; min-width: 0; font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+      <div class="hidden md:block row-cell--fluid text-ellipsis text-12" style="color: var(--text-secondary);">
         {{ contact.notes|default:"—" }}
       </div>
 
-      <!-- Created Date -->
-      <div class="hidden sm:block" style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); text-align: right; flex-shrink: 0; width: 100px;">
+      <div class="hidden sm:block row-cell font-mono-date" style="width: 100px; text-align: right;">
         {{ contact.created_at|date:"d M Y" }}
       </div>
 
-      <!-- Actions -->
-      <div style="display: inline-flex; gap: 6px; justify-content: flex-end; align-items: center; flex-shrink: 0; width: 100px;">
+      <div class="table-actions" style="width: 100px;">
         <a href="{% url 'ledger:contact_detail' contact.pk %}" class="btn btn-action btn-action--info" title="View Details">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -108,8 +90,8 @@
       </div>
     </div>
   {% empty %}
-    <div class="glass-panel" style="text-align: center; padding: 48px; color: var(--text-secondary); border-radius: 12px !important;">
-      <div style="margin-bottom: 12px; font-size: 24px;">👥</div>
+    <div class="empty-state">
+      <div class="empty-state__icon">👥</div>
       <p>No contacts found matching the criteria.</p>
     </div>
   {% endfor %}

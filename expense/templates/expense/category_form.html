@@ -39,7 +39,7 @@
         {{ form.color }}
         <input type="color" id="colorPicker" value="{{ form.color.value|default:'#7C9CFF' }}" style="border: 1px solid var(--glass-border); background: transparent; border-radius: 8px; cursor: pointer; width: 42px; height: 38px; padding: 2px;" />
       </div>
-      <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Choose a color or enter a hex code to style category elements and charts.</p>
+      <p class="text-11" style="color: var(--text-muted); margin-top: 4px;">Choose a color or enter a hex code to style category elements and charts.</p>
       {% if form.color.errors %}
         {% for error in form.color.errors %}
           <span class="form-error">{{ error }}</span>

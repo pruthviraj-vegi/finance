@@ -136,7 +136,7 @@
       <!-- Active checkbox -->
       <div class="form-group" style="grid-column: span 2; display: flex; align-items: center; gap: 8px;">
         {{ form.active }}
-        <label for="{{ form.active.id_for_label }}" style="font-weight: 500; font-size: 13px; color: var(--text-primary); cursor: pointer; user-select: none;">
+        <label for="{{ form.active.id_for_label }}" class="text-13" style="font-weight: 500; color: var(--text-primary); cursor: pointer; user-select: none;">
           Active
         </label>
         {% if form.active.errors %}

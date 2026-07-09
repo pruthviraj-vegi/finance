@@ -8,7 +8,7 @@
 
 {% block content %}
 <!-- Search & Filters Bar -->
-<form id="recurringFilterForm" class="filter-bar" style="animation: cardUp 0.6s var(--ease-out) both;">
+<form id="recurringFilterForm" class="filter-bar">
   <div style="display: flex; gap: 12px; flex-wrap: wrap; flex: 1; align-items: center;">
     
     <!-- Search Input -->
@@ -44,8 +44,8 @@
 </form>
 
 <!-- Recurring Items Table Container -->
-<div id="recurringTableContainer" class="space-y-2" style="animation: cardUp 0.6s var(--ease-out) 0.1s both;">
-  <div class="glass-panel" style="padding: 48px; text-align: center; color: var(--text-secondary); border-radius: 16px;">
+<div id="recurringTableContainer" class="space-y-2 animate-cardup-delayed">
+  <div class="loader-placeholder">
     <span class="loader-spinner"></span>
     <p style="margin-top: 8px;">Loading recurring items...</p>
   </div>

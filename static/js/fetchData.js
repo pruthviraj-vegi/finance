@@ -178,7 +178,7 @@ async function loadTableData(formId, tableId, fetchUrl, options = {}, page = 1) 
     } else {
         const loadingText = options.loadingText || "Loading...";
         targetElement.innerHTML = `
-            <div class="glass-panel" style="padding: 48px; text-align: center; color: var(--text-secondary); border-radius: 16px;">
+            <div class="loader-placeholder">
                 <span class="loader-spinner"></span>
                 <p style="margin-top: 8px;">${loadingText}</p>
             </div>

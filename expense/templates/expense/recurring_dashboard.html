@@ -6,7 +6,7 @@
 
 {% block page_title %}Recurring Expenses{% endblock %}
 {% block page_actions %}
-<span style="font-size: 13px; color: var(--text-secondary);">Manage your automated commitments and subscriptions.</span>
+<span class="text-13" style="color: var(--text-secondary);">Manage your automated commitments and subscriptions.</span>
 {% endblock %}
 
 {% block content %}
@@ -72,10 +72,10 @@
         <div style="display: flex; align-items: center; gap: 8px;">
           {% if item.pending_payments and item.pending_payments.0.due_date < today %}
             <span class="rc-dot rc-dot--overdue"></span>
-            <span style="font-size: 13px; color: var(--accent-expense);">Overdue: {{ item.pending_payments.0.due_date|date:"M d" }}</span>
+            <span class="text-13" style="color: var(--accent-expense);">Overdue: {{ item.pending_payments.0.due_date|date:"M d" }}</span>
           {% elif item.next_due_date %}
             <span class="rc-dot rc-dot--upcoming"></span>
-            <span style="font-size: 13px; color: var(--text-secondary);">Next: {{ item.next_due_date|date:"M d" }}</span>
+            <span class="text-13" style="color: var(--text-secondary);">Next: {{ item.next_due_date|date:"M d" }}</span>
           {% endif %}
         </div>
         {% if item.pending_payments %}

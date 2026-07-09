@@ -35,7 +35,7 @@
       {% if form.contact.errors %}
         <span class="form-error">{{ form.contact.errors.0 }}</span>
       {% endif %}
-      <div style="margin-top: 4px; font-size: 11px; color: var(--text-muted);">
+      <div class="text-11" style="margin-top: 4px; color: var(--text-muted);">
         Can't find the contact? <a href="{% url 'ledger:contact_create' %}" style="color: var(--accent-primary); text-decoration: underline;">Create a new contact first</a>.
       </div>
     </div>
