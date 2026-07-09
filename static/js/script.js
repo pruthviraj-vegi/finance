@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initChartPeriodToggle();
   initRevenueChart();
   initIndianNumberInputs();
+  initFlatpickr();
 });
 
 /* ============================================
@@ -462,4 +463,19 @@ function initIndianNumberInputs() {
         });
     });
 }
+
+/* ============================================
+   Flatpickr Global Initialization
+   ============================================ */
+function initFlatpickr() {
+  if (typeof flatpickr !== 'undefined') {
+    flatpickr('input[type="date"]', {
+      altInput: true,
+      altFormat: "d-m-Y",
+      dateFormat: "Y-m-d",
+      disableMobile: true // Ensure consistent themed style on mobile
+    });
+  }
+}
+
 
