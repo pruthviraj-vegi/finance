@@ -87,6 +87,7 @@ LOGIN_EXEMPT_URLS = [
     r"^media/.*$",
     r"^login/.*$",
     r"^api/.*$",
+    r"^admin/.*$",
 ]
 
 TEMPLATES = [
