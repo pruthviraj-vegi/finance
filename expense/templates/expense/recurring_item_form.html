@@ -14,14 +14,14 @@
     {% csrf_token %}
 
     {% if form.non_field_errors %}
-      <div style="margin-bottom: 20px; color: var(--error);">
+      <div style="color: var(--error);" class="mb-20">
         {% for error in form.non_field_errors %}
           <p class="form-error">{{ error }}</p>
         {% endfor %}
       </div>
     {% endif %}
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+    <div style="grid-template-columns: 1fr 1fr;" class="d-grid gap-16">
       
       <!-- Name -->
       <div class="form-group" style="grid-column: span 2;">
@@ -134,9 +134,9 @@
       </div>
 
       <!-- Active checkbox -->
-      <div class="form-group" style="grid-column: span 2; display: flex; align-items: center; gap: 8px;">
+      <div class="form-group d-flex align-center gap-8" style="grid-column: span 2;">
         {{ form.active }}
-        <label for="{{ form.active.id_for_label }}" class="text-13" style="font-weight: 500; color: var(--text-primary); cursor: pointer; user-select: none;">
+        <label for="{{ form.active.id_for_label }}" class="text-13 font-medium text-primary select-none" style="cursor: pointer;">
           Active
         </label>
         {% if form.active.errors %}

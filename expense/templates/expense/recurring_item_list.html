@@ -2,52 +2,52 @@
 {% load static %}
 
 {% block title %}Recurring Items — My Finance{% endblock %}
-{% block meta_description %}Manage subscriptions, EMIs, and renewal schedules.{% endblock %}
 
 {% block page_title %}Recurring Items{% endblock %}
 
 {% block content %}
 <!-- Search & Filters Bar -->
-<form id="recurringFilterForm" class="filter-bar">
-  <div style="display: flex; gap: 12px; flex-wrap: wrap; flex: 1; align-items: center;">
-    
-    <!-- Search Input -->
-    <div class="search-wrapper--sm" style="max-width: 260px; flex: 1;">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="recurringSearch" name="search" placeholder="Search recurring items..." autocomplete="off" />
-    </div>
-
-    <!-- Type Filter Dropdown -->
-    <select id="typeFilter" name="type" class="form-select form-select--sm" style="width: auto;">
-      <option value="">All Types</option>
-      {% for code, name in types %}
-        <option value="{{ code }}">{{ name }}</option>
-      {% endfor %}
-    </select>
-
-    <!-- Category Filter Dropdown -->
-    <select id="categoryFilter" name="category" class="form-select form-select--sm" style="width: auto;">
-      <option value="">All Categories</option>
-      {% for category in categories %}
-        <option value="{{ category.pk }}">{{ category.name }}</option>
-      {% endfor %}
-    </select>
-
+<form id="recurringFilterForm" class="filter-bar flex-col" style="align-items: stretch;">
+  <!-- Top Row: Search Input -->
+  <div class="search-wrapper--sm" style="max-width: none;">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="recurringSearch" name="search" placeholder="Search recurring items..." autocomplete="off" style="width: 100%;" />
   </div>
 
-  <a href="{% url 'expense:recurring_item_create' %}" class="btn btn--primary btn--compact" id="addRecurringItemBtn">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <line x1="12" y1="5" x2="12" y2="19"></line><line x1="8" y1="12" x2="16" y2="12"></line>
-    </svg>
-    <span>Add Recurring Item</span>
-  </a>
+  <!-- Bottom Row: Filters and Add Button -->
+  <div class="d-flex justify-between align-center flex-wrap gap-12">
+    <div class="d-flex gap-12 flex-wrap align-center">
+      <!-- Type Filter Dropdown -->
+      <select id="typeFilter" name="type" class="form-select form-select--sm" style="width: auto;">
+        <option value="">All Types</option>
+        {% for code, name in types %}
+          <option value="{{ code }}">{{ name }}</option>
+        {% endfor %}
+      </select>
+  
+      <!-- Category Filter Dropdown -->
+      <select id="categoryFilter" name="category" class="form-select form-select--sm" style="width: auto;">
+        <option value="">All Categories</option>
+        {% for category in categories %}
+          <option value="{{ category.pk }}">{{ category.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <a href="{% url 'expense:recurring_item_create' %}" class="btn btn--primary btn--compact" id="addRecurringItemBtn">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line><line x1="8" y1="12" x2="16" y2="12"></line>
+      </svg>
+      <span>Add Item</span>
+    </a>
+  </div>
 </form>
 
 <!-- Recurring Items Table Container -->
 <div id="recurringTableContainer" class="space-y-2 animate-cardup-delayed">
   <div class="loader-placeholder">
     <span class="loader-spinner"></span>
-    <p style="margin-top: 8px;">Loading recurring items...</p>
+    <p class="mt-8">Loading recurring items...</p>
   </div>
 </div>
 {% endblock %}

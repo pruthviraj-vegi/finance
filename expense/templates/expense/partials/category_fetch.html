@@ -1,37 +1,37 @@
 <div class="flex-table-header">
-  <div style="width: 24px; margin-right: 12px; flex-shrink: 0;"></div>
+  <div class="w-24 mr-12 flex-shrink-0"></div>
   
-  <span class="sortable-col" data-sort="name" style="width: 250px;">
+  <span class="sortable-col w-250" data-sort="name">
     Category Name
     <span class="sort-arrow">
       {% if current_sort == "name" %}↑{% elif current_sort == "-name" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <span class="sortable-col hidden sm:inline" data-sort="created_at" style="flex: 1; justify-content: flex-end; margin-right: 24px;">
+  <span class="sortable-col hidden sm:inline flex-1 justify-end mr-24" data-sort="created_at">
     Created At
     <span class="sort-arrow">
       {% if current_sort == "created_at" %}↑{% elif current_sort == "-created_at" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <span style="width: 100px; text-align: right; user-select: none; flex-shrink: 0;">Actions</span>
+  <span class="text-right flex-shrink-0 w-100 select-none">Actions</span>
 </div>
 
 <div class="table-rows">
   {% for category in page_obj %}
-    <div class="glass-panel group flex-table-row">
-      <div class="color-dot" style="background-color: {{ category.color|default:'#7C9CFF' }}; box-shadow: 0 0 10px {{ category.color|default:'#7C9CFF' }}44;"></div>
+    <div class="glass-panel group flex-table-row category-card">
+      <div class="category-card__dot color-dot" style="background-color: {{ category.color|default:'#7C9CFF' }}; box-shadow: 0 0 10px {{ category.color|default:'#7C9CFF' }}44;"></div>
 
-      <div class="row-cell" style="width: 250px; min-width: 0;">
-        <p class="text-13" style="font-weight: 600; color: var(--text-primary); margin: 0;">{{ category.name }}</p>
+      <div class="category-card__name row-cell min-w-0 w-250">
+        <p class="text-13 font-semibold text-primary m-0">{{ category.name }}</p>
       </div>
 
-      <div class="hidden sm:block row-cell font-mono-date" style="flex: 1; text-align: right; margin-right: 24px;">
+      <div class="hidden sm:block category-card__date row-cell font-mono-date flex-1 text-right mr-24">
         {{ category.created_at|date:"d M Y" }}
       </div>
 
-      <div class="table-actions" style="width: 100px;">
+      <div class="category-card__actions table-actions w-100">
         <a href="{% url 'expense:category_update' category.pk %}" class="btn btn-action btn-action--secondary" title="Edit Category">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
             <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>

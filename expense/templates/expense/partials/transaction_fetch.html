@@ -1,76 +1,89 @@
 {% load custom_filters %}
 
 <div class="flex-table-header">
-  <span class="sortable-col" data-sort="date" style="width: 100px;">
-    Date
+  <span class="sortable-col" data-sort="type" style="width: 80px;">
+    Type
     <span class="sort-arrow">
-      {% if current_sort == "date" %}↑{% elif current_sort == "-date" %}↓{% else %}↕{% endif %}
+      {% if current_sort == "type" %}↑{% elif current_sort == "-type" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <span class="sortable-col" data-sort="category" style="width: 140px;">
+  <span class="sortable-col" data-sort="category" style="width: 160px;">
     Category
     <span class="sort-arrow">
       {% if current_sort == "category" %}↑{% elif current_sort == "-category" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <span class="row-cell--fluid" style="user-select: none;">Note</span>
+  <span class="sortable-col w-120" data-sort="date">
+    Date
+    <span class="sort-arrow">
+      {% if current_sort == "date" %}↑{% elif current_sort == "-date" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
 
-  <span class="sortable-col" data-sort="amount" style="width: 120px; justify-content: flex-end;">
+  <span class="row-cell--fluid select-none">Note</span>
+
+  <span class="sortable-col justify-end w-120" data-sort="amount">
     Amount
     <span class="sort-arrow">
       {% if current_sort == "amount" %}↑{% elif current_sort == "-amount" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <span style="width: 80px; text-align: right; user-select: none; flex-shrink: 0;">Actions</span>
+  <span style="width: 80px;" class="text-right flex-shrink-0 select-none">Actions</span>
 </div>
 
 <div class="table-rows">
   {% for txn in page_obj %}
-    <div class="glass-panel group flex-table-row">
-      <div class="row-cell font-mono-date" style="width: 100px;">
-        {{ txn.date|date:"d M Y" }}
-      </div>
-
-      <div class="row-cell" style="width: 140px; display: flex; align-items: center;">
+    <div class="glass-panel group flex-table-row expense-card">
+      <div class="expense-card__left">
+        <span class="expense-card__type-badge">
+          {% if txn.type == "income" %}
+            <span class="type-dot type-dot--income"></span>
+            <span class="text-accent-income text-11 font-semibold">Income</span>
+          {% else %}
+            <span class="type-dot type-dot--expense"></span>
+            <span class="text-accent-expense text-11 font-semibold">Expense</span>
+          {% endif %}
+        </span>
         <span class="category-badge">
           <span class="category-badge__dot" style="background-color: {{ txn.category.color|default:'#7C9CFF' }};"></span>
           {{ txn.category.name|default:"Uncategorized" }}
         </span>
+        <span class="expense-card__date font-mono-date">{{ txn.date|date:"d M Y" }}</span>
+        <div class="expense-card__note text-12 text-secondary text-ellipsis">
+          {{ txn.note|default:"—" }}
+          {% if txn.recurring_payment %}
+            <span class="recurring-tag">Recurring</span>
+          {% endif %}
+        </div>
       </div>
 
-      <div class="row-cell--fluid text-ellipsis text-12" style="color: var(--text-secondary);">
-        {{ txn.note|default:"—" }}
-        {% if txn.recurring_payment %}
-          <span class="recurring-tag">Recurring</span>
-        {% endif %}
-      </div>
-
-      <div class="row-cell font-mono-amount" style="width: 120px; text-align: right;">
-        {% if txn.type == "income" %}
-          <span class="text-accent-income">+{{ txn.amount|currency }}</span>
-        {% else %}
-          <span class="text-accent-expense">-{{ txn.amount|currency }}</span>
-        {% endif %}
-      </div>
-
-      <div class="table-actions" style="width: 80px;">
-        <a href="{% url 'expense:transaction_update' txn.pk %}" class="btn btn-action btn-action--secondary" title="Edit Transaction">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
-        </a>
-        <a href="{% url 'expense:transaction_delete' txn.pk %}" class="btn btn-action btn-action--danger" title="Delete Transaction">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
-            <line x1="10" y1="11" x2="10" y2="17"></line>
-            <line x1="14" y1="11" x2="14" y2="17"></line>
-          </svg>
-        </a>
+      <div class="expense-card__right">
+        <div class="expense-card__amount font-mono-amount">
+          {% if txn.type == "income" %}
+            <span class="text-accent-income">+{{ txn.amount|currency }}</span>
+          {% else %}
+            <span class="text-accent-expense">-{{ txn.amount|currency }}</span>
+          {% endif %}
+        </div>
+        <div class="table-actions">
+          <a href="{% url 'expense:transaction_update' txn.pk %}" class="btn btn-action btn-action--secondary" title="Edit Transaction">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </a>
+          <a href="{% url 'expense:transaction_delete' txn.pk %}" class="btn btn-action btn-action--danger" title="Delete Transaction">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </a>
+        </div>
       </div>
     </div>
   {% empty %}

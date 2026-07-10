@@ -17,7 +17,7 @@
     <input type="hidden" name="next" value="{{ next_url }}" />
 
     {% if form.non_field_errors %}
-      <div style="margin-bottom: 20px; color: var(--error);">
+      <div style="color: var(--error);" class="mb-20">
         {% for error in form.non_field_errors %}
           <p class="form-error">{{ error }}</p>
         {% endfor %}
@@ -55,8 +55,8 @@
           <span class="form-error">{{ error }}</span>
         {% endfor %}
       {% endif %}
-      <p class="text-11" style="color: var(--text-muted); margin-top: 4px;">
-        Don't see your category? <a href="{% url 'expense:category_create' %}" style="color: var(--accent-primary); text-decoration: underline;">Create a new category</a> first.
+      <p class="text-11 text-muted mt-4">
+        Don't see your category? <a href="{% url 'expense:category_create' %}" class="text-accent-primary underline">Create a new category</a> first.
       </p>
     </div>
 

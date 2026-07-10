@@ -730,8 +730,7 @@ input {
     animation: none !important;
   }
 
-  .btn--primary:hover,
-  .btn--social:hover {
+  .btn--primary:hover {
     transform: none !important;
   }
 }

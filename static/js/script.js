@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initRevenueChart();
   initIndianNumberInputs();
   initFlatpickr();
+  initAutofocus();
 });
 
 /* ============================================
@@ -301,7 +302,7 @@ function initChartPeriodToggle() {
    Counter Animation
    ============================================ */
 function animateCounters() {
-  document.querySelectorAll('.stat-card__value').forEach(el => {
+  document.querySelectorAll('.stat-card__value:not(.no-anim)').forEach(el => {
     const text = el.textContent;
     const match = text.replace(/[^0-9.]/g, '');
     if (!match) return;
@@ -475,6 +476,40 @@ function initFlatpickr() {
       dateFormat: "Y-m-d",
       disableMobile: true // Ensure consistent themed style on mobile
     });
+  }
+}
+
+/* ============================================
+   Autofocus First Input on Load
+   ============================================ */
+function initAutofocus() {
+  const pageContent = document.getElementById('pageContent') || document.querySelector('.page-content');
+  if (!pageContent) return;
+
+  // Disable auto-focus on mobile devices to prevent the virtual keyboard from popping up
+  if (window.innerWidth <= 768) return;
+
+  // Selectable input types: inputs (excluding button/hidden/submit etc), selects, textareas
+  const focusableSelector = [
+    'input:not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]):not([disabled]):not([readonly])',
+    'select:not([disabled]):not([readonly])',
+    'textarea:not([disabled]):not([readonly])'
+  ].join(', ');
+
+  const candidates = pageContent.querySelectorAll(focusableSelector);
+
+  for (const el of candidates) {
+    // Check if the element is visible in the viewport/layout
+    const isVisible = !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+    if (isVisible) {
+      el.focus();
+      // For text-based inputs, position cursor at the end of the content
+      if (el.tagName === 'INPUT' && ['text', 'search', 'url', 'tel', 'email', 'password', 'number'].includes(el.type)) {
+        const len = el.value.length;
+        el.setSelectionRange(len, len);
+      }
+      break;
+    }
   }
 }
 

@@ -3,7 +3,6 @@
 {% load custom_filters %}
 
 {% block title %}Dashboard — Finance{% endblock %}
-{% block meta_description %}Your financial overview at a glance. Track income, expenses, and transactions.{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
 
 {% block extra_css %}
@@ -31,56 +30,56 @@
   <!-- Spent Card -->
   <div class="stat-card" id="statExpense">
     <div class="stat-card__header">
-      <span class="font-label-caps text-label-caps text-on-surface-variant">TOTAL SPENT</span>
-      <span class="material-symbols-outlined text-accent-expense text-lg">trending_down</span>
+      <span class="stat-card__label">TOTAL SPENT</span>
+      <span class="material-symbols-outlined text-accent-expense text-24">trending_down</span>
     </div>
-    <div class="font-num-xl text-num-xl text-on-surface">{{ total_expense|currency }}</div>
-    <div class="text-12" style="display: flex; align-items: center; gap: 6px; margin-top: 8px;">
-      <span class="{% if expense_trend_is_up %}text-accent-expense{% else %}text-accent-income{% endif %} font-num-sm">
+    <div class="stat-card__value">{{ total_expense|currency }}</div>
+    <div class="stat-card__trend">
+      <span class="{% if expense_trend_is_up %}text-accent-expense{% else %}text-accent-income{% endif %}">
         {% if expense_trend_is_up %}+{% else %}-{% endif %}{{ expense_trend_abs }}%
       </span>
-      <span class="text-on-surface-variant">vs last month</span>
+      <span class="text-secondary">vs last month</span>
     </div>
   </div>
   
   <!-- Income Card -->
   <div class="stat-card" id="statIncome">
     <div class="stat-card__header">
-      <span class="font-label-caps text-label-caps text-on-surface-variant">TOTAL INCOME</span>
-      <span class="material-symbols-outlined text-accent-income text-lg">trending_up</span>
+      <span class="stat-card__label">TOTAL INCOME</span>
+      <span class="material-symbols-outlined text-accent-income text-24">trending_up</span>
     </div>
-    <div class="font-num-xl text-num-xl text-on-surface">{{ total_income|currency }}</div>
-    <div class="text-12" style="display: flex; align-items: center; gap: 6px; margin-top: 8px;">
-      <span class="{% if income_trend_is_up %}text-accent-income{% else %}text-accent-expense{% endif %} font-num-sm">
+    <div class="stat-card__value">{{ total_income|currency }}</div>
+    <div class="stat-card__trend">
+      <span class="{% if income_trend_is_up %}text-accent-income{% else %}text-accent-expense{% endif %}">
         {% if income_trend_is_up %}+{% else %}-{% endif %}{{ income_trend_abs }}%
       </span>
-      <span class="text-on-surface-variant">vs last month</span>
+      <span class="text-secondary">vs last month</span>
     </div>
   </div>
 
   <!-- Due Card -->
   <div class="stat-card" id="statPending">
     <div class="stat-card__header">
-      <span class="font-label-caps text-label-caps text-on-surface-variant">TOTAL DUE</span>
-      <span class="material-symbols-outlined text-accent-pending text-lg">schedule</span>
+      <span class="stat-card__label">TOTAL DUE</span>
+      <span class="material-symbols-outlined text-accent-pending text-24">schedule</span>
     </div>
-    <div class="font-num-xl text-num-xl text-on-surface">{{ pending_amount|currency }}</div>
-    <div class="text-12" style="display: flex; align-items: center; gap: 6px; margin-top: 8px;">
-      <span class="text-on-surface font-bold">{{ pending_count }}</span>
-      <span class="text-on-surface-variant">pending item{{ pending_count|pluralize }}</span>
+    <div class="stat-card__value">{{ pending_amount|currency }}</div>
+    <div class="stat-card__trend">
+      <span class="text-primary font-bold">{{ pending_count }}</span>
+      <span class="text-secondary">pending item{{ pending_count|pluralize }}</span>
     </div>
   </div>
 
   <!-- Net Balance Card -->
   <div class="stat-card" id="statBalance" style="border-color: rgba(124, 156, 255, 0.2); background: rgba(124, 156, 255, 0.05);">
     <div class="stat-card__header">
-      <span class="font-label-caps text-label-caps text-accent-primary">NET BALANCE</span>
-      <span class="material-symbols-outlined text-accent-primary text-lg" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+      <span class="stat-card__label text-accent-primary">NET BALANCE</span>
+      <span class="material-symbols-outlined text-accent-primary text-24" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
     </div>
-    <div class="font-num-xl text-num-xl text-on-surface">{{ net_balance|currency }}</div>
-    <div class="text-12" style="display: flex; align-items: center; gap: 6px; margin-top: 8px;">
-      <span class="text-accent-primary font-num-sm">Stable</span>
-      <span class="text-on-surface-variant">growth trajectory</span>
+    <div class="stat-card__value">{{ net_balance|currency }}</div>
+    <div class="stat-card__trend">
+      <span class="text-accent-primary">Stable</span>
+      <span class="text-secondary">growth trajectory</span>
     </div>
   </div>
 </section>
@@ -88,7 +87,7 @@
 <!-- Middle Row: Charts -->
 <section class="dashboard-row">
   <!-- Trend Line Chart Glass Card -->
-  <div class="glass-panel" style="display: flex; flex-direction: column; min-height: 320px; position: relative; overflow: hidden;">
+  <div class="glass-panel d-flex flex-col" style="min-height: 320px; position: relative; overflow: hidden;">
     <div class="trend-chart-header">
       <div class="trend-chart-title-wrap">
         <h3 class="trend-chart-title">Financial Momentum</h3>
@@ -96,7 +95,7 @@
       </div>
       <div class="trend-chart-chips">
         <button class="chip" data-period="1M">1M</button>
-        <button class="chip bg-accent-primary text-on-primary" data-period="6M">6M</button>
+        <button class="chip bg-accent-primary" data-period="6M" style="color: var(--bg-base);">6M</button>
         <button class="chip" data-period="1Y">1Y</button>
       </div>
     </div>
@@ -120,7 +119,7 @@
   </div>
 
   <!-- Donut Chart Glass Card -->
-  <div class="glass-panel" style="display: flex; flex-direction: column; min-height: 320px;">
+  <div class="glass-panel d-flex flex-col" style="min-height: 320px;">
     <div class="category-breakdown-container">
       <div class="category-breakdown-header-wrap">
         <h3 class="trend-chart-title">Category Breakdown</h3>
@@ -151,7 +150,7 @@
             <span class="category-breakdown-legend-text" title="{{ cat.name }}">{{ cat.name }}</span>
           </div>
         {% empty %}
-          <div class="text-12" style="grid-column: span 2; text-align: center; color: var(--text-secondary);">No expense data available</div>
+          <div class="text-12 text-center text-secondary" style="grid-column: span 2;">No expense data available</div>
         {% endfor %}
       </div>
     </div>
@@ -161,16 +160,16 @@
 <!-- Bottom Row: Equal grid for Upcoming & Loan Portfolio -->
 <section class="equal-grid">
   <!-- Upcoming Recurring -->
-  <div class="glass-panel" style="display: flex; flex-direction: column;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-      <h3 class="trend-chart-title" style="margin: 0;">Upcoming Recurring</h3>
-      <a href="{% url 'expense:recurring_item_list' %}" class="text-12" style="color: var(--accent-primary); font-weight: 500;">View All</a>
+  <div class="glass-panel d-flex flex-col">
+    <div class="d-flex justify-between align-center mb-24">
+      <h3 class="trend-chart-title m-0">Upcoming Recurring</h3>
+      <a href="{% url 'expense:recurring_item_list' %}" class="text-12 text-accent-primary font-medium">View All</a>
     </div>
-    <div style="display: flex; flex-direction: column; gap: 12px; flex-grow: 1;">
+    <div style="flex-grow: 1;" class="d-flex flex-col gap-12">
       {% for payment in upcoming_recurring %}
-      <div class="group" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--glass-fill-dark); border-radius: 16px; transition: all 0.3s; position: relative;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="position: relative; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+      <div class="group d-flex align-center justify-between p-12 rounded-16" style="background: var(--glass-fill-dark); transition: all 0.3s; position: relative;">
+        <div class="d-flex align-center gap-12">
+          <div style="position: relative; width: 40px; height: 40px;" class="d-flex align-center justify-center">
             <svg style="position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg);" viewBox="0 0 48 48">
               <circle cx="24" cy="24" fill="none" r="20" stroke="rgba(255,255,255,0.05)" stroke-width="3"></circle>
               <circle class="progress-ring-circle" cx="24" cy="24" fill="none" r="20" stroke="#7C9CFF" stroke-dasharray="125.6" stroke-dashoffset="{{ payment.dash_offset }}" stroke-width="3"></circle>
@@ -178,68 +177,68 @@
             <span class="material-symbols-outlined text-accent-primary text-16">{{ payment.icon }}</span>
           </div>
           <div>
-            <div class="text-14" style="font-weight: 700; color: var(--text-primary);">{{ payment.name }}</div>
-            <div class="text-12" style="color: var(--text-secondary);">{{ payment.due_text }}</div>
+            <div class="text-14 font-bold text-primary">{{ payment.name }}</div>
+            <div class="text-12 text-secondary">{{ payment.due_text }}</div>
           </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span class="text-14 amount-val" style="font-family: var(--font-mono); color: var(--text-primary); transition: all 0.2s;">{{ payment.amount|currency }}</span>
-          <a href="{% url 'expense:toggle_recurring_payment' payment.id %}?next={{ request.path|urlencode }}" class="pay-btn text-11" style="display: none; background: var(--accent-primary); color: #002979; font-weight: 700; padding: 4px 12px; border-radius: 9999px;">
+        <div class="d-flex align-center gap-8">
+          <span class="text-14 amount-val font-mono text-primary" style="transition: all 0.2s;">{{ payment.amount|currency }}</span>
+          <a href="{% url 'expense:toggle_recurring_payment' payment.id %}?next={{ request.path|urlencode }}" class="pay-btn text-11 font-bold" style="display: none; background: var(--accent-primary); color: #002979; padding: 4px 12px; border-radius: 9999px;">
             PAY
           </a>
         </div>
       </div>
       {% empty %}
-      <p class="text-14" style="text-align: center; color: var(--text-secondary); padding: 24px 0; margin: auto;">No upcoming recurring payments.</p>
+      <p class="text-14 text-center text-secondary" style="padding: 24px 0; margin: auto;">No upcoming recurring payments.</p>
       {% endfor %}
     </div>
   </div>
 
   <!-- Loan Portfolio -->
-  <div class="glass-panel" style="display: flex; flex-direction: column;">
-    <h3 class="trend-chart-title" style="margin: 0 0 24px 0;">Loan Portfolio</h3>
-    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; flex-grow: 1;">
+  <div class="glass-panel d-flex flex-col">
+    <h3 class="trend-chart-title m-0 mb-24">Loan Portfolio</h3>
+    <div style="flex-grow: 1;" class="d-grid grid-cols-2 gap-16">
       <!-- Owed to you -->
-      <div style="padding: 16px; border-radius: 20px; background: rgba(52, 211, 153, 0.05); border: 1px solid rgba(52, 211, 153, 0.15); display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="background: rgba(52, 211, 153, 0.05); border: 1px solid rgba(52, 211, 153, 0.15);" class="p-16 rounded-20 d-flex flex-col justify-between">
         <div>
-          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+          <div class="d-flex align-center gap-6 mb-6">
             <span class="material-symbols-outlined text-accent-income text-16" style="font-variation-settings: 'FILL' 1;">call_received</span>
-            <span class="font-label-caps text-accent-income text-10" style="font-weight: 700;">OWED TO YOU</span>
+            <span class="text-label-caps text-accent-income">OWED TO YOU</span>
           </div>
-          <p class="text-12" style="color: var(--text-secondary); margin: 0;">From {{ lent_contracts }} contract{{ lent_contracts|pluralize }}</p>
+          <p class="text-12 text-secondary m-0">From {{ lent_contracts }} contract{{ lent_contracts|pluralize }}</p>
         </div>
-        <div style="margin-top: 24px;">
-          <div class="font-num-xl text-on-surface text-20">{{ owed_to_you|currency }}</div>
-          <div style="width: 100%; height: 4px; border-radius: 9999px; background: rgba(255,255,255,0.05); margin-top: 12px; overflow: hidden;">
+        <div class="mt-24">
+          <div class="font-heading text-20 font-bold text-primary">{{ owed_to_you|currency }}</div>
+          <div style="width: 100%; height: 4px; border-radius: 9999px; background: rgba(255,255,255,0.05); overflow: hidden;" class="mt-12">
             <div style="height: 100%; background: var(--accent-income); width: {{ lent_repaid_pct }}%;"></div>
           </div>
-          <div class="text-11" style="display: flex; justify-content: space-between; margin-top: 6px; color: var(--text-secondary);">
+          <div class="text-11 d-flex justify-between mt-6 text-secondary">
             <span>{{ lent_repaid_pct }}% repaid</span>
           </div>
         </div>
       </div>
 
       <!-- You owe -->
-      <div style="padding: 16px; border-radius: 20px; background: rgba(251, 113, 133, 0.05); border: 1px solid rgba(251, 113, 133, 0.15); display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="background: rgba(251, 113, 133, 0.05); border: 1px solid rgba(251, 113, 133, 0.15);" class="p-16 rounded-20 d-flex flex-col justify-between">
         <div>
-          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+          <div class="d-flex align-center gap-6 mb-6">
             <span class="material-symbols-outlined text-accent-expense text-16" style="font-variation-settings: 'FILL' 1;">call_made</span>
-            <span class="font-label-caps text-accent-expense text-10" style="font-weight: 700;">YOU OWE</span>
+            <span class="text-label-caps text-accent-expense">YOU OWE</span>
           </div>
-          <p class="text-12" style="color: var(--text-secondary); margin: 0;">From {{ borrowed_contracts }} active loan{{ borrowed_contracts|pluralize }}</p>
+          <p class="text-12 text-secondary m-0">From {{ borrowed_contracts }} active loan{{ borrowed_contracts|pluralize }}</p>
         </div>
-        <div style="margin-top: 24px;">
-          <div class="font-num-xl text-on-surface text-20">{{ you_owe|currency }}</div>
-          <div style="width: 100%; height: 4px; border-radius: 9999px; background: rgba(255,255,255,0.05); margin-top: 12px; overflow: hidden;">
+        <div class="mt-24">
+          <div class="font-heading text-20 font-bold text-primary">{{ you_owe|currency }}</div>
+          <div style="width: 100%; height: 4px; border-radius: 9999px; background: rgba(255,255,255,0.05); overflow: hidden;" class="mt-12">
             <div style="height: 100%; background: var(--accent-expense); width: {{ borrowed_repaid_pct }}%;"></div>
           </div>
-          <div class="text-11" style="display: flex; justify-content: space-between; margin-top: 6px; color: var(--text-secondary);">
+          <div class="text-11 d-flex justify-between mt-6 text-secondary">
             <span>{{ borrowed_repaid_pct }}% repaid</span>
           </div>
         </div>
       </div>
     </div>
-    <a href="{% url 'ledger:contact_list' %}" class="text-14" style="display: block; width: 100%; margin-top: 24px; text-align: center; padding: 12px; border-radius: 16px; background: var(--text-primary); color: var(--bg-base); font-weight: 700;">
+    <a href="{% url 'ledger:contact_list' %}" class="text-14 mt-24 text-center p-12 rounded-16 font-bold" style="display: block; width: 100%; background: var(--text-primary); color: var(--bg-base);">
       MANAGE ALL LOANS
     </a>
   </div>

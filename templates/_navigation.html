@@ -55,6 +55,10 @@
 
     <div class="nav-section">
       <span class="nav-section__label">EXPENSE TRACKER</span>
+      <a href="{% url 'expense:recurring_dashboard' %}" class="nav-item {% if active_page == 'recurring_dashboard' %}nav-item--active{% endif %}" id="nav-recurring-dashboard" data-tooltip="Recurring Dashboard">
+        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <span>Recurring Dashboard</span>
+      </a>
       <a href="{% url 'expense:transaction_list' %}" class="nav-item {% if active_page == 'expense_transactions' or active_page == 'transactions' and request.resolver_match.app_name == 'expense' %}nav-item--active{% endif %}" id="nav-expense-transactions" data-tooltip="Expenses">
         <svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
         <span>Expenses</span>
@@ -62,10 +66,6 @@
       <a href="{% url 'expense:category_list' %}" class="nav-item {% if active_page == 'expense_categories' or active_page == 'categories' %}nav-item--active{% endif %}" id="nav-expense-categories" data-tooltip="Categories">
         <svg class="nav-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         <span>Categories</span>
-      </a>
-      <a href="{% url 'expense:recurring_dashboard' %}" class="nav-item {% if active_page == 'recurring_dashboard' %}nav-item--active{% endif %}" id="nav-recurring-dashboard" data-tooltip="Recurring Dashboard">
-        <svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-        <span>Recurring Dashboard</span>
       </a>
       <a href="{% url 'expense:recurring_item_list' %}" class="nav-item {% if active_page == 'recurring' or active_page == 'recurring_items' %}nav-item--active{% endif %}" id="nav-recurring-items" data-tooltip="Recurring Items">
         <svg class="nav-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>

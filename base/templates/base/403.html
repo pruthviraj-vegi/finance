@@ -5,16 +5,16 @@
 {% block page_title %}Access Denied{% endblock %}
 
 {% block content %}
-<div class="form-card" style="text-align: center; max-width: 500px; animation: cardUp 0.6s var(--ease-out) both;">
-  <div class="text-28" style="width: 64px; height: 64px; border-radius: 50%; background: rgba(251, 113, 133, 0.1); color: var(--accent-expense); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; margin-left: auto; margin-right: auto;">
+<div class="form-card text-center max-w-500 animate-card-up">
+  <div class="text-28 rounded-full text-accent-expense align-center justify-center mb-16 ml-auto mr-auto w-64 h-64 d-inline-flex bg-expense-dim">
     ⚠️
   </div>
-  <h2 class="text-20" style="font-family: var(--font-heading); font-weight: 600; color: var(--text-primary); margin-bottom: 8px;">Permission Required</h2>
-  <p class="text-14" style="color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px;">
+  <h2 class="text-20 font-heading font-semibold text-primary mb-8">Permission Required</h2>
+  <p class="text-14 text-secondary mb-24 leading-15">
     You do not have permission to access this area, this area is for admins.
   </p>
 
-  <div style="display: flex; justify-content: center; gap: 12px;">
+  <div class="d-flex justify-center gap-12">
     <a href="{% url 'base:home' %}" class="btn btn--primary">Return to Dashboard</a>
   </div>
 </div>

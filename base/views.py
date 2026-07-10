@@ -31,8 +31,13 @@ def home_view(request):
     total_expense = expense_agg["total"] or Decimal("0.00")
     net_balance = total_income - total_expense
     
-    # Calculate pending recurring payments for the logged-in user
-    pending_payments = RecurringPayment.objects.filter(recurring_item__user=request.user, paid=False).order_by("due_date")
+    # Calculate pending recurring payments for the logged-in user (only active & not deleted items)
+    pending_payments = RecurringPayment.objects.filter(
+        recurring_item__user=request.user,
+        recurring_item__is_deleted=False,
+        recurring_item__active=True,
+        paid=False
+    ).order_by("due_date")
     pending_count = pending_payments.count()
     pending_amount = pending_payments.aggregate(total=Sum("amount"))["total"] or Decimal("0.00")
     

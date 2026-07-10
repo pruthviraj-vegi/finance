@@ -2,15 +2,14 @@
 {% load static %}
 
 {% block title %}Categories — My Finance{% endblock %}
-{% block meta_description %}Manage expense categories with custom colors and labels.{% endblock %}
 
 {% block page_title %}Categories{% endblock %}
 
 {% block content %}
 <!-- Search & Add Bar -->
 <form id="categoryFilterForm" class="filter-bar">
-  <div style="display: flex; gap: 12px; flex-wrap: wrap; flex: 1; align-items: center;">
-  <div class="search-wrapper--sm" style="flex: 1; max-width: 300px;">
+  <div class="d-flex gap-12 flex-wrap flex-1 align-center">
+  <div class="search-wrapper--sm flex-1" style="max-width: 300px;">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     <input type="text" id="categorySearch" name="search" placeholder="Search categories..." autocomplete="off" />
   </div>
@@ -27,7 +26,7 @@
 <div id="categoryTableContainer" class="space-y-2 animate-cardup-delayed">
   <div class="loader-placeholder">
     <span class="loader-spinner"></span>
-    <p style="margin-top: 8px;">Loading categories...</p>
+    <p class="mt-8">Loading categories...</p>
   </div>
 </div>
 {% endblock %}

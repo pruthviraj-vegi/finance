@@ -2,166 +2,281 @@
 {% load custom_filters %}
 
 {% block title %}{{ item.name }} — Recurring Item Detail{% endblock %}
-{% block meta_description %}View detail schedule and pay cycles for {{ item.name }}.{% endblock %}
 
-{% block page_title %}Recurring Detail{% endblock %}
+{% block page_title %}{{ item.name }}{% endblock %}
+
+{% block meta_description %}Details, payment checklist, and schedule history for recurring item {{ item.name }}.{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+{% endblock %}
 
 {% block content %}
-<div style="display: flex; flex-direction: column; gap: 24px;">
+<div class="d-flex flex-col gap-24">
 
-  <!-- Back Link & Main Header Details -->
-  <div style="display: flex; align-items: center; justify-content: space-between; animation: cardUp 0.6s var(--ease-out) both;">
-    <a href="{% url 'expense:recurring_item_list' %}" class="btn btn--secondary btn--sm" style="display:inline-flex; align-items:center; gap:6px; border-radius:8px;">
+  <!-- Back Link & Action Buttons -->
+  <div class="d-flex align-center justify-between flex-wrap gap-12 animate-card-up">
+    <a href="{% url 'expense:recurring_item_list' %}" class="btn btn--secondary btn--compact">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
       </svg>
       <span>Back to Recurring List</span>
     </a>
     
-    <div style="display: flex; gap: 8px;">
-      <a href="{% url 'expense:recurring_item_update' item.pk %}" class="btn btn--secondary btn--sm" style="border-radius:8px;">Edit Item</a>
-      <a href="{% url 'expense:recurring_item_delete' item.pk %}" class="btn btn--danger btn--sm" style="border-radius:8px;">Delete Item</a>
+    <div class="d-flex gap-8">
+      <a href="{% url 'expense:recurring_item_update' item.pk %}?next={{ request.path|urlencode }}" class="btn btn--secondary btn--compact">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
+          <path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+        </svg>
+        <span>Edit Item</span>
+      </a>
+      <a href="{% url 'expense:recurring_item_delete' item.pk %}" class="btn btn--danger btn--compact">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+        </svg>
+        <span>Delete Item</span>
+      </a>
     </div>
   </div>
 
-  <!-- Detail Overview Panel -->
-  <div class="glass-panel" style="padding: 24px; animation: cardUp 0.6s var(--ease-out) 0.1s both; border-radius: 16px;">
-    <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+  <!-- Detail Overview Panel (using Vault Glass Stats Grid) -->
+  <section class="stats-grid animate-card-up">
+    
+    <!-- Card 1: Profile Info -->
+    <div class="stat-card d-flex flex-col justify-between">
       <div>
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-          <span class="text-20" style="font-family: var(--font-heading); font-weight: 600; color: var(--text-primary);">{{ item.name }}</span>
-          {% if item.active %}
-            <span class="status-badge--active-compact">ACTIVE</span>
-          {% else %}
-            <span class="status-badge--paused">PAUSED/COMPLETED</span>
-          {% endif %}
+        <div class="stat-card__header">
+          <span class="stat-card__label">RECURRING PROFILE</span>
+          <span class="material-symbols-outlined text-secondary text-24">sync</span>
         </div>
-        
-        <div class="text-12" style="display: flex; align-items: center; gap: 12px; color: var(--text-secondary);">
-          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: 4px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05);">
-            <span style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ item.category.color|default:'#7C9CFF' }}; display: inline-block;"></span>
-            {{ item.category.name|default:"Uncategorized" }}
-          </span>
-          <span>•</span>
-          <span style="text-transform: capitalize;">{{ item.get_type_display }}</span>
-          <span>•</span>
-          <span style="text-transform: capitalize;">{{ item.frequency }} billing</span>
-        </div>
-      </div>
-
-      <div style="text-align: right;">
-        <span class="text-label-caps text-11" style="color: var(--text-muted); margin-bottom: 4px;">Billing Amount</span>
-        <span class="text-24" style="font-family: var(--font-heading); font-weight: 700; color: var(--accent-expense);">{{ item.amount|currency }}</span>
-      </div>
-    </div>
-
-    <!-- Stats and Progress Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px;">
-      
-      <div>
-        <span class="text-label-caps text-11" style="color: var(--text-muted); margin-bottom: 4px;">Start Date</span>
-        <span class="text-13" style="font-family: var(--font-mono); font-weight: 500; color: var(--text-primary);">{{ item.start_date|date:"d M Y" }}</span>
-      </div>
-
-      <div>
-        <span class="text-label-caps text-11" style="color: var(--text-muted); margin-bottom: 4px;">Next Due Date</span>
-        <span class="text-13" style="font-family: var(--font-mono); font-weight: 500; color: var(--text-primary);">
-          {% if item.active %}{{ item.next_due_date|date:"d M Y" }}{% else %}—{% endif %}
-        </span>
-      </div>
-
-      {% if item.type == "emi" %}
-        <div style="grid-column: span 2;">
-          <div class="text-11" style="display: flex; justify-content: space-between; color: var(--text-muted); margin-bottom: 6px;">
-            <span>EMI Installment Progress</span>
-            <span style="color: var(--text-primary); font-weight: 600;">{{ item.installments_paid|default:0 }} / {{ item.total_installments|default:"∞" }} Paid</span>
-          </div>
-          <div class="category-bar" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
-            {% if item.total_installments %}
-              {% widthratio item.installments_paid|default:0 item.total_installments 100 as pct %}
-              <div class="category-bar__fill" style="width: {{ pct }}%; background: linear-gradient(90deg, var(--accent-primary), var(--accent-income));"></div>
+        <div class="stat-card__value no-anim text-18 font-bold text-primary m-0 mb-4" style="line-height: 1.2;">{{ item.name }}</div>
+        <div class="d-flex flex-col gap-4">
+          <span class="text-secondary text-11 font-medium" style="text-transform: uppercase;">{{ item.get_type_display }}</span>
+          <div>
+            {% if item.active %}
+              <span class="status-badge status-badge--active">ACTIVE</span>
             {% else %}
-              <div class="category-bar__fill" style="width: 100%; background: var(--accent-primary);"></div>
+              <span class="status-badge status-badge--paused">PAUSED</span>
             {% endif %}
           </div>
         </div>
+      </div>
+      {% if item.notes %}
+        <div class="pt-8 mt-8 border-t-glass">
+          <p class="text-11 text-secondary m-0 leading-14 text-ellipsis">{{ item.notes }}</p>
+        </div>
       {% endif %}
-
     </div>
-  </div>
+
+    <!-- Card 2: Billing Amount -->
+    <div class="stat-card d-flex flex-col justify-between">
+      <div>
+        <div class="stat-card__header">
+          <span class="stat-card__label text-accent-expense">BILLING AMOUNT</span>
+          <span class="material-symbols-outlined text-accent-expense text-24">payments</span>
+        </div>
+        <div class="stat-card__value text-accent-expense m-0 mb-4">{{ item.amount|currency }}</div>
+        <div class="d-flex flex-col gap-4">
+          <span class="text-secondary text-11 font-medium" style="text-transform: capitalize;">{{ item.frequency }}</span>
+          <div>
+            <span class="category-badge">
+              <span class="category-badge__dot" style="background-color: {{ item.category.color|default:'#7C9CFF' }};"></span>
+              {{ item.category.name|default:"Uncategorized" }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Schedule Dates -->
+    <div class="stat-card d-flex flex-col justify-between">
+      <div>
+        <div class="stat-card__header">
+          <span class="stat-card__label">SCHEDULE</span>
+          <span class="material-symbols-outlined text-secondary text-24">calendar_today</span>
+        </div>
+        <div class="d-flex flex-col gap-8">
+          <div class="d-flex justify-between align-center">
+            <span class="text-11 text-secondary">Start Date:</span>
+            <span class="font-mono text-12 text-primary font-medium">{{ item.start_date|date:"d M Y" }}</span>
+          </div>
+          {% if item.end_date %}
+          <div class="d-flex justify-between align-center">
+            <span class="text-11 text-secondary">End Date:</span>
+            <span class="font-mono text-12 text-primary font-medium">{{ item.end_date|date:"d M Y" }}</span>
+          </div>
+          {% endif %}
+          <div class="d-flex justify-between align-center">
+            <span class="text-11 text-secondary">Next Due:</span>
+            <span class="font-mono text-12 text-primary font-medium">
+              {% if item.active %}{{ item.next_due_date|date:"d M Y" }}{% else %}—{% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Progress / Tenure -->
+    <div class="stat-card d-flex flex-col justify-between">
+      {% if item.type == 'emi' %}
+        <div>
+          <div class="stat-card__header">
+            <span class="stat-card__label">EMI PROGRESS</span>
+            <span class="material-symbols-outlined text-secondary text-24">hourglass_empty</span>
+          </div>
+          <div class="stat-card__value no-anim d-flex align-center m-0" style="font-size: 1.375rem; font-weight: 700; color: var(--text-primary);">
+            <span>{{ item.installments_paid|default:0 }}</span>
+            <span style="font-family: system-ui, -apple-system, sans-serif; font-weight: 400; opacity: 0.6; margin: 0 4px;">/</span>
+            <span>{{ item.total_installments|default:"∞" }}</span>
+          </div>
+          <div class="mt-8">
+            <div class="category-bar">
+              {% if item.total_installments %}
+                {% widthratio item.installments_paid|default:0 item.total_installments 100 as pct %}
+                <div class="category-bar__fill" style="width: {{ pct }}%; background: linear-gradient(90deg, var(--accent-primary), var(--accent-income));"></div>
+              {% else %}
+                <div class="category-bar__fill" style="width: 100%; background: var(--accent-primary);"></div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="d-flex flex-col justify-between h-full">
+          <div>
+            <div class="stat-card__header">
+              <span class="stat-card__label">TENURE</span>
+              <span class="material-symbols-outlined text-secondary text-24">all_inclusive</span>
+            </div>
+            <h3 class="stat-card__value text-18 font-bold text-primary m-0 mb-4" style="line-height: 1.2;">Indefinite</h3>
+            <div class="stat-card__trend">
+              <span class="text-secondary">Runs until cancelled</span>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+  </section>
 
   <!-- Pay Cycles Checklist Section -->
-  <div class="glass-panel" style="padding: 24px; animation: cardUp 0.6s var(--ease-out) 0.2s both; border-radius: 16px;">
-    <h3 class="text-14" style="font-family: var(--font-heading); font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-primary);"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+  <div class="d-flex flex-col gap-16 animate-card-up" style="animation-delay: 0.15s;">
+    <h3 class="text-heading-sm font-heading font-semibold text-primary m-0 d-flex align-center gap-8">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent-primary">
+        <polyline points="9 11 12 14 22 4"></polyline>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+      </svg>
       <span>Payment Checklist & History</span>
     </h3>
 
-    <div class="table-container" style="background: transparent; border: none; box-shadow: none; margin-top: 0;">
-      <table class="data-table" style="background: transparent;">
-        <thead>
-          <tr>
-            <th style="padding-left: 8px;">Cycle Period</th>
-            <th>Due Date</th>
-            <th style="text-align: right;">Amount</th>
-            <th style="text-align: center;">Status</th>
-            <th>Paid Date</th>
-            <th>Linked Ledger</th>
-            <th style="text-align: right; padding-right: 8px;">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for payment in payments %}
-            <tr>
-              <td style="padding-left: 8px; font-weight: 600; color: var(--text-primary);">
-                {{ payment.period_label }}
-              </td>
-              <td class="text-12" style="font-family: var(--font-mono); color: var(--text-secondary);">
-                {{ payment.due_date|date:"d M Y" }}
-              </td>
-              <td class="text-12" style="font-family: var(--font-mono); text-align: right; font-weight: 600; color: var(--text-primary);">
-                {{ payment.amount|currency }}
-              </td>
-              <td style="text-align: center;">
-                {% if payment.paid %}
-                  <span class="status-badge--active-compact">PAID</span>
-                {% else %}
-                  <span class="status-badge--due">DUE</span>
-                {% endif %}
-              </td>
-              <td class="text-12" style="font-family: var(--font-mono); color: var(--text-muted);">
-                {{ payment.paid_date|date:"d M Y"|default:"—" }}
-              </td>
-              <td>
-                {% if payment.transaction %}
-                  <a href="{% url 'expense:transaction_update' payment.transaction.pk %}?next={{ request.path|urlencode }}" class="text-12" style="color: var(--accent-primary); text-decoration: underline;">
-                    View Txn
-                  </a>
-                {% else %}
-                  <span style="color: var(--text-muted);">—</span>
-                {% endif %}
-              </td>
-              <td style="text-align: right; padding-right: 8px;">
-                {% if payment.paid %}
-                  <a href="{% url 'expense:toggle_recurring_payment' payment.pk %}?next={{ request.path|urlencode }}" class="btn btn--secondary btn--sm text-10" style="border-radius: 6px; padding: 3px 8px;">
-                    Mark Unpaid
-                  </a>
-                {% else %}
-                  <a href="{% url 'expense:toggle_recurring_payment' payment.pk %}?next={{ request.path|urlencode }}" class="btn btn--primary btn--sm text-10" style="border-radius: 6px; padding: 3px 8px;">
-                    Pay Now
-                  </a>
-                {% endif %}
-              </td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 32px;">
-                No payment schedules generated.
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <!-- Flex Table Header -->
+    <div class="flex-table-header">
+      <span class="w-120 select-none">Cycle Period</span>
+      <span class="w-120 select-none">Due Date</span>
+      <span class="w-110 justify-end text-right select-none">Amount</span>
+      <span class="w-100 justify-center text-center select-none">Status</span>
+      <span class="w-120 select-none">Paid Date</span>
+      <span class="row-cell--fluid select-none">Linked Ledger</span>
+      <span class="w-100 justify-end text-right select-none">Action</span>
+    </div>
+
+    <!-- Flex Table Rows -->
+    <div class="table-rows">
+      {% for payment in payments %}
+        <div class="glass-panel group flex-table-row payment-card">
+          
+          <div class="payment-card__left">
+            <!-- Category Badge (Mobile only) -->
+            <span class="category-badge sm:hidden block mb-4">
+              <span class="category-badge__dot" style="background-color: {{ item.category.color|default:'#7C9CFF' }};"></span>
+              {{ item.category.name|default:"Uncategorized" }}
+            </span>
+
+            <!-- Type Display (Mobile only) -->
+            <span class="payment-card__type sm:hidden block text-11 text-secondary mb-4">
+              {{ item.get_type_display }}
+            </span>
+
+            <!-- Cycle Period -->
+            <span class="w-120 font-semibold text-primary payment-card__cycle-period" data-label="Cycle Period">
+              <span class="text-10 text-muted sm:hidden block mb-4">Cycle Period</span>
+              {{ payment.period_label }}
+            </span>
+            
+            <!-- Due Date -->
+            <span class="w-120 font-mono text-secondary payment-card__due-date" data-label="Due Date">
+              <span class="text-10 text-muted sm:hidden block mb-4">Due Date</span>
+              {{ payment.due_date|date:"d M Y" }}
+            </span>
+            
+            <!-- Status -->
+            <span class="w-100 justify-center text-center payment-card__status" data-label="Status">
+              <span class="text-10 text-muted sm:hidden block mb-4 text-left">Status</span>
+              {% if payment.paid %}
+                <span class="status-badge status-badge--active">PAID</span>
+              {% else %}
+                <span class="status-badge status-badge--due">DUE</span>
+              {% endif %}
+            </span>
+            
+            <!-- Paid Date -->
+            <span class="w-120 font-mono text-muted payment-card__paid-date" data-label="Paid Date">
+              <span class="text-10 text-muted sm:hidden block mb-4">Paid Date</span>
+              {% if payment.paid %}
+                Paid: {{ payment.paid_date|date:"d M Y" }}
+              {% else %}
+                —
+              {% endif %}
+            </span>
+          </div>
+
+          <div class="payment-card__right">
+            <!-- Name (Mobile only) -->
+            <div class="payment-card__name text-13 font-semibold text-primary text-ellipsis sm:hidden block mb-4">
+              {{ item.name }}
+            </div>
+
+            <!-- Amount -->
+            <span class="w-110 font-mono text-right justify-end font-semibold text-primary payment-card__amount" data-label="Amount">
+              <span class="text-10 text-muted sm:hidden block mb-4 text-left">Amount</span>
+              {{ payment.amount|currency }}
+            </span>
+            
+            <!-- Linked Ledger -->
+            <span class="row-cell--fluid text-secondary payment-card__linked-ledger" data-label="Linked Ledger">
+              <span class="text-10 text-muted sm:hidden block mb-4">Linked Ledger</span>
+              {% if payment.transaction %}
+                <a href="{% url 'expense:transaction_update' payment.transaction.pk %}?next={{ request.path|urlencode }}" class="text-accent-primary underline">
+                  View Txn
+                </a>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </span>
+            
+            <!-- Actions -->
+            <span class="w-100 table-actions justify-end text-right payment-card__actions" data-label="Action">
+              {% if payment.paid %}
+                <a href="{% url 'expense:toggle_recurring_payment' payment.pk %}?next={{ request.path|urlencode }}" class="btn btn--secondary btn--compact">
+                  Mark Unpaid
+                </a>
+              {% else %}
+                <a href="{% url 'expense:toggle_recurring_payment' payment.pk %}?next={{ request.path|urlencode }}" class="btn btn--primary btn--compact">
+                  Pay Now
+                </a>
+              {% endif %}
+            </span>
+          </div>
+          
+        </div>
+      {% empty %}
+        <div class="empty-state">
+          <div class="empty-state__icon">🔄</div>
+          <p>No payment schedules generated.</p>
+        </div>
+      {% endfor %}
     </div>
   </div>
 

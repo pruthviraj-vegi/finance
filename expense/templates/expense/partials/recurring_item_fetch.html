@@ -1,106 +1,100 @@
 {% load custom_filters %}
 
 <div class="flex-table-header">
-  <span class="sortable-col" data-sort="name" style="width: 160px;">
-    Name
-    <span class="sort-arrow">
-      {% if current_sort == "name" %}↑{% elif current_sort == "-name" %}↓{% else %}↕{% endif %}
-    </span>
-  </span>
-
-  <span class="sortable-col" data-sort="type" style="width: 120px;">
-    Type
-    <span class="sort-arrow">
-      {% if current_sort == "type" %}↑{% elif current_sort == "-type" %}↓{% else %}↕{% endif %}
-    </span>
-  </span>
-
-  <span class="sortable-col" data-sort="category" style="width: 130px;">
+  <span class="sortable-col" data-sort="category" style="width: 160px;">
     Category
     <span class="sort-arrow">
       {% if current_sort == "category" %}↑{% elif current_sort == "-category" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <span class="sortable-col" data-sort="next_due_date" style="width: 110px;">
+  <span class="sortable-col w-120" data-sort="type">
+    Type
+    <span class="sort-arrow">
+      {% if current_sort == "type" %}↑{% elif current_sort == "-type" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <span class="sortable-col w-120" data-sort="next_due_date">
     Next Due
     <span class="sort-arrow">
       {% if current_sort == "next_due_date" %}↑{% elif current_sort == "-next_due_date" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <span class="sortable-col" data-sort="amount" style="width: 110px; justify-content: flex-end;">
+  <span class="w-100 text-center select-none flex-shrink-0">Status</span>
+
+  <span class="sortable-col row-cell--fluid" data-sort="name">
+    Name
+    <span class="sort-arrow">
+      {% if current_sort == "name" %}↑{% elif current_sort == "-name" %}↓{% else %}↕{% endif %}
+    </span>
+  </span>
+
+  <span class="sortable-col justify-end w-110" data-sort="amount">
     Amount
     <span class="sort-arrow">
       {% if current_sort == "amount" %}↑{% elif current_sort == "-amount" %}↓{% else %}↕{% endif %}
     </span>
   </span>
 
-  <span class="row-cell--fluid" style="user-select: none; text-align: center;">Status</span>
-
-  <span style="width: 100px; text-align: right; user-select: none; flex-shrink: 0;">Actions</span>
+  <span class="text-right flex-shrink-0 w-100 select-none">Actions</span>
 </div>
 
 <div class="table-rows">
   {% for item in page_obj %}
-    <div class="glass-panel group flex-table-row">
-      <div class="row-cell" style="width: 160px; min-width: 0;">
-        <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="nav-link-hover text-ellipsis-block text-13" style="font-weight: 600; color: var(--text-primary); margin: 0;">{{ item.name }}</a>
-      </div>
-
-      <div class="row-cell" style="width: 120px;">
-        <p class="text-12" style="color: var(--text-secondary); margin: 0;">{{ item.get_type_display }}</p>
-        <p class="text-10" style="color: var(--text-muted); margin: 0; text-transform: capitalize;">{{ item.frequency }}</p>
-      </div>
-
-      <div class="row-cell" style="width: 130px; display: flex; align-items: center;">
+    <div class="glass-panel group flex-table-row recurring-card">
+      <div class="recurring-card__left">
         <span class="category-badge">
           <span class="category-badge__dot" style="background-color: {{ item.category.color|default:'#7C9CFF' }};"></span>
           {{ item.category.name|default:"Uncategorized" }}
         </span>
+        <span class="recurring-card__type text-11 text-secondary">{{ item.get_type_display }}</span>
+        <span class="recurring-card__date font-mono-date">
+          {% if item.active %}
+            {{ item.next_due_date|date:"d M Y" }}
+          {% else %}
+            —
+          {% endif %}
+        </span>
+        <div class="recurring-card__status">
+          {% if item.active %}
+            <span class="status-badge--active-compact">ACTIVE</span>
+          {% else %}
+            <span class="status-badge--paused">PAUSED</span>
+          {% endif %}
+        </div>
       </div>
 
-      <div class="row-cell font-mono-date" style="width: 110px;">
-        {% if item.active %}
-          {{ item.next_due_date|date:"d M Y" }}
-        {% else %}
-          —
-        {% endif %}
-      </div>
-
-      <div class="row-cell font-mono-amount text-accent-expense" style="width: 110px; text-align: right;">
-        {{ item.amount|currency }}
-      </div>
-
-      <div class="row-cell--fluid" style="text-align: center;">
-        {% if item.active %}
-          <span class="status-badge--active-compact">ACTIVE</span>
-        {% else %}
-          <span class="status-badge--paused">PAUSED</span>
-        {% endif %}
-      </div>
-
-      <div class="table-actions" style="width: 100px;">
-        <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="btn btn-action btn-action--info" title="View Details">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-        </a>
-        <a href="{% url 'expense:recurring_item_update' item.pk %}" class="btn btn-action btn-action--secondary" title="Edit Item">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
-        </a>
-        <a href="{% url 'expense:recurring_item_delete' item.pk %}" class="btn btn-action btn-action--danger" title="Delete Item">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
-            <line x1="10" y1="11" x2="10" y2="17"></line>
-            <line x1="14" y1="11" x2="14" y2="17"></line>
-          </svg>
-        </a>
+      <div class="recurring-card__right">
+        <div class="recurring-card__name text-13 font-semibold text-primary text-ellipsis">
+          <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="nav-link-hover">{{ item.name }}</a>
+        </div>
+        <div class="recurring-card__amount font-mono-amount text-accent-expense">
+          {{ item.amount|currency }}
+        </div>
+        <div class="table-actions">
+          <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="btn btn-action btn-action--info" title="View Details">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </a>
+          <a href="{% url 'expense:recurring_item_update' item.pk %}" class="btn btn-action btn-action--secondary" title="Edit Item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </a>
+          <a href="{% url 'expense:recurring_item_delete' item.pk %}" class="btn btn-action btn-action--danger" title="Delete Item">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </a>
+        </div>
       </div>
     </div>
   {% empty %}

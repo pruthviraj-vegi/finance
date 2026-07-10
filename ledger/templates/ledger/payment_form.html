@@ -2,12 +2,11 @@
 {% load static %}
 
 {% block title %}Record Repayment — My Finance{% endblock %}
-{% block meta_description %}Record a payment or repayment against a transaction.{% endblock %}
 
 {% block page_title %}Record Repayment{% endblock %}
 
 {% block content %}
-<div class="form-card" style="animation: cardUp 0.6s var(--ease-out) both;">
+<div class="form-card animate-card-up">
   <form method="post" novalidate>
     {% csrf_token %}
     {% if next_url %}
@@ -16,7 +15,7 @@
     
     <!-- Non-field errors -->
     {% if form.non_field_errors %}
-      <div class="alert alert--error" role="alert" style="margin-bottom: 20px;">
+      <div class="alert alert--error mb-20" role="alert">
         {% for error in form.non_field_errors %}
           {{ error }}
         {% endfor %}

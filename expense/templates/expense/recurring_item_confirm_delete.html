@@ -4,14 +4,14 @@
 {% block page_title %}Delete Recurring Item{% endblock %}
 
 {% block content %}
-<div class="form-card" style="text-align: center; max-width: 500px;">
-  <div class="text-48" style="margin-bottom: 16px; color: var(--accent-expense);">⚠️</div>
-  <h3 class="text-16" style="font-family: var(--font-heading); font-weight: 600; margin-bottom: 12px;">Delete Recurring Item?</h3>
-  <p style="color: var(--text-secondary); margin-bottom: 24px;">Are you sure you want to delete the recurring item <strong>"{{ object.name }}"</strong>? This and its associated schedules will be soft-deleted.</p>
+<div class="form-card text-center max-w-500">
+  <div class="text-48 mb-16 text-accent-expense">⚠️</div>
+  <h3 class="text-16 font-heading font-semibold mb-12">Delete Recurring Item?</h3>
+  <p class="text-secondary mb-24">Are you sure you want to delete the recurring item <strong>"{{ object.name }}"</strong>? This and its associated schedules will be soft-deleted.</p>
   
   <form method="post">
     {% csrf_token %}
-    <div style="display: flex; justify-content: center; gap: 12px;">
+    <div class="d-flex justify-center gap-12">
       <a href="{% url 'expense:recurring_item_list' %}" class="btn btn--secondary">Cancel</a>
       <button type="submit" class="btn btn--danger">Delete</button>
     </div>

@@ -5,20 +5,19 @@
   {% if is_create %}Add New Contact{% else %}Edit Contact — {{ object.name }}{% endif %} — My Finance
 {% endblock %}
 
-{% block meta_description %}Create or update a financial contact record.{% endblock %}
 
 {% block page_title %}
   {% if is_create %}Add New Contact{% else %}Edit Contact{% endif %}
 {% endblock %}
 
 {% block content %}
-<div class="form-card" style="animation: cardUp 0.6s var(--ease-out) both;">
+<div class="form-card animate-card-up">
   <form method="post" novalidate>
     {% csrf_token %}
     
     <!-- Non-field errors -->
     {% if form.non_field_errors %}
-      <div class="alert alert--error" role="alert" style="margin-bottom: 20px;">
+      <div class="alert alert--error mb-20" role="alert">
         {% for error in form.non_field_errors %}
           {{ error }}
         {% endfor %}
