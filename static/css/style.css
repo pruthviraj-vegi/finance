@@ -42,6 +42,7 @@ body { font-size: 0.8125rem; }
 }
 .sidebar__header { display:flex; align-items:center; gap:12px; padding:20px 20px 16px; border-bottom:1px solid var(--glass-border); }
 .sidebar__logo { width:40px; height:40px; display:flex; align-items:center; justify-content:center; background:rgba(124,156,255,0.08); border:1px solid rgba(124,156,255,0.15); border-radius:12px; flex-shrink:0; }
+.sidebar__logo-img { width: 100%; height: 100%; object-fit: contain; border-radius: 12px; }
 .sidebar__brand { flex:1; }
 .sidebar__brand-name { font-family:var(--font-heading); font-size: 1rem; font-weight:600; background:linear-gradient(135deg,#E0E2E6 30%,#7C9CFF 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:block; }
 .sidebar__brand-tagline { font-size: 0.6875rem; color:var(--text-muted); letter-spacing:0.05em; text-transform:uppercase; }

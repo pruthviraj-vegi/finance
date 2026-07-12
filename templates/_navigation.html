@@ -3,18 +3,7 @@
 <aside class="sidebar" id="sidebar">
   <div class="sidebar__header">
     <div class="sidebar__logo">
-      <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-        <defs>
-          <linearGradient id="navLogoGrad" x1="0" y1="0" x2="48" y2="48">
-            <stop offset="0%" stop-color="#7C9CFF" />
-            <stop offset="100%" stop-color="#34D399" />
-          </linearGradient>
-        </defs>
-        <rect x="4" y="8" width="40" height="32" rx="6" stroke="url(#navLogoGrad)" stroke-width="2.5" fill="none" />
-        <path d="M4 16H44" stroke="url(#navLogoGrad)" stroke-width="2" opacity="0.5" />
-        <circle cx="24" cy="28" r="6" stroke="url(#navLogoGrad)" stroke-width="2" fill="none" />
-        <path d="M24 22V28L28 30" stroke="url(#navLogoGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
+      <img src="{% static 'images/logo.png' %}" alt="My Finance Logo" class="sidebar__logo-img">
     </div>
     <div class="sidebar__brand">
       <span class="sidebar__brand-name">My Finance</span>
