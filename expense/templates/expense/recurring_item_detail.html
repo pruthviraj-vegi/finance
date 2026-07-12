@@ -179,13 +179,13 @@
       <span class="w-100 justify-center text-center select-none">Status</span>
       <span class="w-120 select-none">Paid Date</span>
       <span class="row-cell--fluid select-none">Linked Ledger</span>
-      <span class="w-100 justify-end text-right select-none">Action</span>
+      <span class="justify-end text-right flex-shrink-0 select-none">Action</span>
     </div>
 
     <!-- Flex Table Rows -->
     <div class="table-rows">
       {% for payment in payments %}
-        <div class="glass-panel group flex-table-row payment-card">
+        <div class="glass-panel row-card row-card--split">
           
           <div class="payment-card__left">
             <!-- Category Badge (Mobile only) -->
@@ -257,7 +257,7 @@
             </span>
             
             <!-- Actions -->
-            <span class="w-100 table-actions justify-end text-right payment-card__actions" data-label="Action">
+            <span class="table-actions justify-end text-right payment-card__actions" data-label="Action">
               {% if payment.paid %}
                 <a href="{% url 'expense:toggle_recurring_payment' payment.pk %}?next={{ request.path|urlencode }}" class="btn btn--secondary btn--compact">
                   Mark Unpaid

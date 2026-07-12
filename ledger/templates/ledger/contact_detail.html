@@ -194,7 +194,7 @@
               </div>
             </div>
 
-            <div class="table-actions d-flex align-center gap-6 justify-end" style="width: 70px;">
+            <div class="table-actions d-flex align-center gap-6 justify-end">
               {% if entry.type == 'transaction' %}
                 <a href="{% url 'ledger:transaction_update' entry.pk %}?next={{ request.path }}" class="btn btn-action btn-action--secondary" title="Edit Transaction">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">

@@ -31,13 +31,13 @@
     </span>
   </span>
 
-  <span style="width: 80px;" class="text-right flex-shrink-0 select-none">Actions</span>
+  <span class="text-right flex-shrink-0 select-none">Actions</span>
 </div>
 
 <div class="table-rows">
   {% for txn in page_obj %}
-    <div class="glass-panel group flex-table-row expense-card">
-      <div class="expense-card__left">
+    <div class="glass-panel row-card row-card--split">
+      <div class="row-card__col--left expense-card__left">
         <span class="expense-card__type-badge">
           {% if txn.type == "income" %}
             <span class="type-dot type-dot--income"></span>
@@ -60,7 +60,7 @@
         </div>
       </div>
 
-      <div class="expense-card__right">
+      <div class="row-card__col--right expense-card__right">
         <div class="expense-card__amount font-mono-amount">
           {% if txn.type == "income" %}
             <span class="text-accent-income">+{{ txn.amount|currency }}</span>

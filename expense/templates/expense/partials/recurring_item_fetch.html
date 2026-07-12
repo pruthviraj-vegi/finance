@@ -38,13 +38,13 @@
     </span>
   </span>
 
-  <span class="text-right flex-shrink-0 w-100 select-none">Actions</span>
+  <span class="text-right flex-shrink-0 select-none">Actions</span>
 </div>
 
 <div class="table-rows">
   {% for item in page_obj %}
-    <div class="glass-panel group flex-table-row recurring-card">
-      <div class="recurring-card__left">
+    <div class="glass-panel row-card row-card--split">
+      <div class="row-card__col--left recurring-card__left">
         <span class="category-badge">
           <span class="category-badge__dot" style="background-color: {{ item.category.color|default:'#7C9CFF' }};"></span>
           {{ item.category.name|default:"Uncategorized" }}
@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <div class="recurring-card__right">
+      <div class="row-card__col--right recurring-card__right">
         <div class="recurring-card__name text-13 font-semibold text-primary text-ellipsis">
           <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="nav-link-hover">{{ item.name }}</a>
         </div>

@@ -11,17 +11,17 @@
 <div class="dashboard-grid" id="recurringGrid">
 
   {% for item in active_items %}
-  <div class="glass-panel glass-card" style="animation-delay: {{ forloop.counter0 }}00ms;">
+  <div class="glass-panel dash-card" style="animation-delay: {{ forloop.counter0 }}00ms;">
 
     <!-- ── Top: Type label + Icon/Ring ── -->
-    <div class="glass-card__top">
+    <div class="dash-card__top">
 
       {% if item.type == "emi" %}
         <!-- EMI: label left, ring right -->
         <div>
-          <span class="glass-card__type glass-card__type--primary">Equated Monthly Installment</span>
-          <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="glass-card__title">{{ item.name }}</a>
-          <p class="glass-card__amount">{{ item.amount|currency }} <span class="glass-card__freq">/ {% if item.frequency == "monthly" %}mo{% elif item.frequency == "quarterly" %}qtr{% else %}yr{% endif %}</span></p>
+          <span class="dash-card__type dash-card__type--primary">Equated Monthly Installment</span>
+          <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="dash-card__title">{{ item.name }}</a>
+          <p class="dash-card__amount">{{ item.amount|currency }} <span class="dash-card__freq">/ {% if item.frequency == "monthly" %}mo{% elif item.frequency == "quarterly" %}qtr{% else %}yr{% endif %}</span></p>
         </div>
         {% if item.total_installments %}
         <div class="progress-ring" title="{{ item.installments_paid|default:0 }} of {{ item.total_installments }} paid">
@@ -36,9 +36,9 @@
       {% elif item.type == "subscription" %}
         <!-- Subscription: label left, icon right -->
         <div>
-          <span class="glass-card__type glass-card__type--success">Subscription</span>
-          <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="glass-card__title">{{ item.name }}</a>
-          <p class="glass-card__amount">{{ item.amount|currency }} <span class="glass-card__freq">/ {% if item.frequency == "monthly" %}mo{% elif item.frequency == "quarterly" %}qtr{% else %}yr{% endif %}</span></p>
+          <span class="dash-card__type dash-card__type--success">Subscription</span>
+          <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="dash-card__title">{{ item.name }}</a>
+          <p class="dash-card__amount">{{ item.amount|currency }} <span class="dash-card__freq">/ {% if item.frequency == "monthly" %}mo{% elif item.frequency == "quarterly" %}qtr{% else %}yr{% endif %}</span></p>
         </div>
         <div class="icon-box icon-box--primary">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
@@ -47,9 +47,9 @@
       {% else %}
         <!-- Renewal: label left, icon right -->
         <div>
-          <span class="glass-card__type glass-card__type--danger">Annual Renewal</span>
-          <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="glass-card__title">{{ item.name }}</a>
-          <p class="glass-card__amount">{{ item.amount|currency }} <span class="glass-card__freq">/ {% if item.frequency == "monthly" %}mo{% elif item.frequency == "quarterly" %}qtr{% else %}yr{% endif %}</span></p>
+          <span class="dash-card__type dash-card__type--danger">Annual Renewal</span>
+          <a href="{% url 'expense:recurring_item_detail' item.pk %}" class="dash-card__title">{{ item.name }}</a>
+          <p class="dash-card__amount">{{ item.amount|currency }} <span class="dash-card__freq">/ {% if item.frequency == "monthly" %}mo{% elif item.frequency == "quarterly" %}qtr{% else %}yr{% endif %}</span></p>
         </div>
         <div class="icon-box icon-box--danger">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -59,8 +59,8 @@
     </div>
 
     <!-- ── Bottom: Status / Due / Pay ── -->
-    <div class="glass-card__bottom">
-        <div class="glass-card__status">
+    <div class="dash-card__bottom">
+        <div class="dash-card__status">
           {% if item.pending_payments and item.pending_payments.0.due_date < today %}
             <span class="status-dot status-dot--overdue"></span>
             <span class="text-13 text-color-expense">Overdue: {{ item.pending_payments.0.due_date|date:"M d" }}</span>
@@ -78,7 +78,7 @@
   {% endfor %}
 
   <!-- Add New Recurring Card -->
-  <a href="{% url 'expense:recurring_item_create' %}" class="glass-card glass-card--add" style="animation-delay: {{ active_items|length }}00ms;">
+  <a href="{% url 'expense:recurring_item_create' %}" class="dash-card dash-card--add" style="animation-delay: {{ active_items|length }}00ms;">
     <div class="add-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </div>
@@ -86,13 +86,13 @@
   </a>
 </div>
 
-<!-- Summary Stats Bento -->
-<div class="stat-bento-cards" id="recurringStats">
+<!-- Summary Stats -->
+<div class="stats-grid" id="recurringStats">
   <!-- Monthly Commitment — spans 2 cols on responsive, 2fr on desktop -->
-  <div class="glass-panel stat-bento-card stat-bento-card--wide">
-    <span class="stat-bento-card__label">MONTHLY COMMITMENT</span>
-    <div class="stat-bento-card__row">
-      <span class="stat-bento-card__value">{{ monthly_commitment|currency }}</span>
+  <div class="glass-panel stat-card stat-card--wide">
+    <span class="stat-card__label">MONTHLY COMMITMENT</span>
+    <div class="d-flex gap-12 align-baseline mt-12 mb-12">
+      <span class="stat-card__value">{{ monthly_commitment|currency }}</span>
     </div>
     <!-- Breakdown bar -->
     <div class="breakdown-bar">
@@ -108,10 +108,10 @@
   </div>
 
   <!-- Due This Month — spans 2 cols on responsive, 2fr on desktop -->
-  <div class="glass-panel stat-bento-card stat-bento-card--wide">
-    <span class="stat-bento-card__label">DUE THIS MONTH</span>
-    <div class="stat-bento-card__row">
-      <span class="stat-bento-card__value">{{ this_month_unpaid|currency }}</span>
+  <div class="glass-panel stat-card stat-card--wide">
+    <span class="stat-card__label">DUE THIS MONTH</span>
+    <div class="d-flex gap-12 align-baseline mt-12 mb-12">
+      <span class="stat-card__value">{{ this_month_unpaid|currency }}</span>
       <span class="text-color-secondary" style="align-self: flex-end; margin-bottom: 2px; font-size: 0.8125rem;">unpaid of {{ this_month_total|currency }}</span>
     </div>
     <!-- Breakdown bar -->
@@ -133,22 +133,22 @@
   </div>
 
   <!-- Active Schedules -->
-  <div class="glass-panel stat-bento-card stat-bento-card--center">
-    <svg class="stat-bento-card__icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent-pending)" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
-    <span class="stat-bento-card__big">{{ total_active }}</span>
-    <span class="stat-bento-card__label">Active Schedules</span>
+  <div class="glass-panel stat-card stat-card--center">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent-pending)" stroke-width="1.5" stroke-linecap="round" class="mb-8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
+    <span class="stat-card__value">{{ total_active }}</span>
+    <span class="stat-card__label">Active Schedules</span>
   </div>
 
   <!-- Overdue -->
-  <div class="glass-panel stat-bento-card stat-bento-card--center">
+  <div class="glass-panel stat-card stat-card--center">
     {% if overdue_count > 0 %}
-      <svg class="stat-bento-card__icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent-expense)" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <span class="stat-bento-card__big text-accent-expense">{{ overdue_sum|currency }}</span>
-      <span class="stat-bento-card__label">{{ overdue_count }} Overdue</span>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent-expense)" stroke-width="1.5" stroke-linecap="round" class="mb-8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span class="stat-card__value text-accent-expense">{{ overdue_sum|currency }}</span>
+      <span class="stat-card__label">{{ overdue_count }} Overdue</span>
     {% else %}
-      <svg class="stat-bento-card__icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent-income)" stroke-width="1.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-      <span class="stat-bento-card__big text-accent-income">All Clear</span>
-      <span class="stat-bento-card__label">No Overdue Payments</span>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent-income)" stroke-width="1.5" stroke-linecap="round" class="mb-8"><polyline points="20 6 9 17 4 12"/></svg>
+      <span class="stat-card__value text-accent-income">All Clear</span>
+      <span class="stat-card__label">No Overdue Payments</span>
     {% endif %}
   </div>
 </div>

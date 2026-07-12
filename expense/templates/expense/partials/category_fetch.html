@@ -15,12 +15,12 @@
     </span>
   </span>
 
-  <span class="text-right flex-shrink-0 w-100 select-none">Actions</span>
+  <span class="text-right flex-shrink-0 select-none">Actions</span>
 </div>
 
 <div class="table-rows">
   {% for category in page_obj %}
-    <div class="glass-panel group flex-table-row category-card">
+    <div class="glass-panel row-card row-card--compact">
       <div class="category-card__dot color-dot" style="background-color: {{ category.color|default:'#7C9CFF' }}; box-shadow: 0 0 10px {{ category.color|default:'#7C9CFF' }}44;"></div>
 
       <div class="category-card__name row-cell min-w-0 w-250">
@@ -31,7 +31,7 @@
         {{ category.created_at|date:"d M Y" }}
       </div>
 
-      <div class="category-card__actions table-actions w-100">
+      <div class="category-card__actions table-actions">
         <a href="{% url 'expense:category_update' category.pk %}" class="btn btn-action btn-action--secondary" title="Edit Category">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round">
             <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
