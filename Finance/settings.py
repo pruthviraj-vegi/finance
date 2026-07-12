@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "user",
     "ledger",
     "expense",
+    "messaging",
 ]
 
 MIDDLEWARE = [
@@ -345,3 +346,8 @@ LOGGING = {
         },
     },
 }
+
+# Telegram Bot Configuration
+TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default="")
+TELEGRAM_BOT_USERNAME = config("TELEGRAM_BOT_USERNAME", default="FinanceTrackerBot")
+

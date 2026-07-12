@@ -22,6 +22,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("contacts/", include("ledger.urls")),
     path("expense/", include("expense.urls")),
+    path("api/telegram/", include("messaging.urls")),
     path("", include("base.urls")),
 ]
 

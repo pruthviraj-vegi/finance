@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Telegram Settings — My Finance{% endblock %}
+
+{% block page_title %}Telegram Settings{% endblock %}
+
+{% block content %}
+<div class="form-card">
+  <div class="mb-20">
+    <p class="text-secondary">Configure Telegram to receive daily EMI reminders and notifications directly on your phone.</p>
+  </div>
+
+  {% if not has_bot_token %}
+    <div class="alert alert--danger mb-20" style="display: block;">
+      <span><strong>Warning:</strong> The Telegram Bot Token is not configured in the application's environment configuration (<code>.env</code> file). The bot will not be able to send reminders or confirmations. Please add <code>TELEGRAM_BOT_TOKEN</code> to your <code>.env</code> file.</span>
+    </div>
+  {% endif %}
+
+  {% if integration.is_active %}
+    <div class="alert alert--success">
+      <span><strong>Status:</strong> Connected (Chat ID: {{ integration.chat_id }})</span>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button id="sendTestBtn" class="btn btn--secondary btn--sm" data-url="{% url 'messaging:send_test_message' %}">Send Test Message</button>
+        <form method="post" action="{% url 'messaging:reset_telegram' %}" style="margin: 0; display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn--danger btn--sm" onclick="return confirm('Are you sure you want to disconnect/reset this Telegram connection?');">Disconnect</button>
+        </form>
+      </div>
+    </div>
+    <div id="testMessageStatus" class="alert" style="display: none; margin-top: 8px;"></div>
+  {% else %}
+    <div class="alert alert--warning">
+      <div>
+        <span><strong>Status:</strong> Not Connected</span>
+        <p class="text-muted text-11 mt-4">To connect your account automatically, click the button below to generate a deep link, open our Telegram Bot, and press "Start".</p>
+        
+        <div class="mt-12">
+          <button id="generateLinkBtn" class="btn btn--secondary btn--sm" data-url="{% url 'messaging:telegram_link' %}">Generate Link</button>
+        </div>
+        
+        <div id="linkContainer" class="mt-12" style="display: none;">
+          <a id="telegramLink" href="#" target="_blank" class="btn btn--primary btn--sm">👉 Open Telegram Bot</a>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    {% if form.non_field_errors %}
+      <div class="form-error mb-20">
+        {% for error in form.non_field_errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Chat ID Field -->
+    <div class="form-group">
+      <label for="{{ form.chat_id.id_for_label }}" class="form-label">Or Set Chat ID Manually</label>
+      {{ form.chat_id }}
+      <p class="text-muted text-11 mt-4">If you know your Telegram Chat ID, you can enter it here directly.</p>
+      {% if form.chat_id.errors %}
+        {% for error in form.chat_id.errors %}
+          <span class="form-error">{{ error }}</span>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary">Save Settings</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pages/telegram_settings.js' %}"></script>
+{% endblock %}
