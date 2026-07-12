@@ -340,6 +340,8 @@ def recurring_dashboard(request):
     """
     from django.db.models import Sum, Prefetch
     from datetime import timedelta
+    from decimal import Decimal
+    import calendar
 
     today = timezone.localdate()
 
@@ -357,16 +359,33 @@ def recurring_dashboard(request):
     )
 
     total_active = active_items.count()
-    total_subscriptions = sum(1 for i in active_items if i.type == "subscription")
-    total_emis = sum(1 for i in active_items if i.type == "emi")
-    total_renewals = sum(1 for i in active_items if i.type == "renewal")
 
-    # Calculate approximate monthly commitment
+    # Calculate approximate monthly commitment (only for monthly items)
     monthly_commitment = sum(
-        item.amount if item.frequency == "monthly" else
-        (item.amount / 3 if item.frequency == "quarterly" else item.amount / 12)
-        for item in active_items
+        (item.amount for item in active_items if item.frequency == "monthly"),
+        Decimal("0.00")
     )
+
+    # Count of active items only among those with monthly frequency for the breakdown bar
+    monthly_active_items = [i for i in active_items if i.frequency == "monthly"]
+    monthly_emis = sum(1 for i in monthly_active_items if i.type == "emi")
+    monthly_subscriptions = sum(1 for i in monthly_active_items if i.type == "subscription")
+    monthly_renewals = sum(1 for i in monthly_active_items if i.type == "renewal")
+
+    # Calculate actual due this month (calendar month)
+    start_of_month = today.replace(day=1)
+    _, last_day = calendar.monthrange(today.year, today.month)
+    end_of_month = today.replace(day=last_day)
+
+    this_month_payments = RecurringPayment.objects.filter(
+        recurring_item__user=request.user,
+        recurring_item__active=True,
+        due_date__gte=start_of_month,
+        due_date__lte=end_of_month
+    )
+    this_month_total = sum((p.amount for p in this_month_payments), Decimal("0.00"))
+    this_month_paid = sum((p.amount for p in this_month_payments if p.paid), Decimal("0.00"))
+    this_month_unpaid = sum((p.amount for p in this_month_payments if not p.paid), Decimal("0.00"))
 
     # Overdue count/sum (payments past due date that are unpaid)
     overdue_qs = RecurringPayment.objects.filter(
@@ -381,10 +400,13 @@ def recurring_dashboard(request):
         "active_page": "recurring_dashboard",
         "active_items": active_items,
         "total_active": total_active,
-        "total_subscriptions": total_subscriptions,
-        "total_emis": total_emis,
-        "total_renewals": total_renewals,
+        "monthly_emis": monthly_emis,
+        "monthly_subscriptions": monthly_subscriptions,
+        "monthly_renewals": monthly_renewals,
         "monthly_commitment": monthly_commitment,
+        "this_month_total": this_month_total,
+        "this_month_paid": this_month_paid,
+        "this_month_unpaid": this_month_unpaid,
         "overdue_count": overdue_count,
         "overdue_sum": overdue_sum,
         "today": today,
@@ -500,25 +522,7 @@ class RecurringItemCreateView(RequiredPermissionMixin, CreateView):
         form.instance.user = self.request.user
         response = super().form_valid(form)
 
-        # Generate the initial unpaid RecurringPayment for this item on creation
-        next_due = self.object.next_due_date
-        if self.object.frequency == "monthly":
-            label = next_due.strftime("%Y-%m")
-        elif self.object.frequency == "quarterly":
-            q = (next_due.month - 1) // 3 + 1
-            label = f"{next_due.year}-Q{q}"
-        else:
-            label = f"{next_due.year}"
-
-        RecurringPayment.objects.get_or_create(
-            recurring_item=self.object,
-            period_label=label,
-            defaults={
-                "due_date": next_due,
-                "amount": self.object.amount,
-                "paid": False
-            }
-        )
+        RecurringPaymentManager.sync_unpaid_payment(self.object)
 
         messages.success(self.request, f"Recurring item '{self.object.name}' has been created successfully.")
         return response
@@ -550,6 +554,7 @@ class RecurringItemUpdateView(RequiredPermissionMixin, UpdateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
+        RecurringPaymentManager.sync_unpaid_payment(self.object)
         messages.success(self.request, f"Recurring item '{self.object.name}' has been updated successfully.")
         return response
 

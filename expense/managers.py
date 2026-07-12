@@ -146,3 +146,42 @@ class RecurringPaymentManager:
         ).delete()
 
         return payment
+
+    @staticmethod
+    @transaction.atomic
+    def sync_unpaid_payment(item):
+        """
+        Synchronizes the unpaid RecurringPayment with the current state of the RecurringItem.
+        If the item has an unpaid payment, updates its due_date, amount, and period_label.
+        If no unpaid payment exists and the item is active, creates one.
+        """
+        if not item.active:
+            # If item is inactive, delete any future unpaid payments
+            RecurringPayment.objects.filter(recurring_item=item, paid=False).delete()
+            return
+
+        # Calculate period label
+        next_due = item.next_due_date
+        if item.frequency == "monthly":
+            label = next_due.strftime("%Y-%m")
+        elif item.frequency == "quarterly":
+            q = (next_due.month - 1) // 3 + 1
+            label = f"{next_due.year}-Q{q}"
+        else:
+            label = f"{next_due.year}"
+
+        # Find the unpaid payment
+        unpaid_payment = RecurringPayment.objects.filter(recurring_item=item, paid=False).first()
+        if unpaid_payment:
+            unpaid_payment.due_date = next_due
+            unpaid_payment.amount = item.amount
+            unpaid_payment.period_label = label
+            unpaid_payment.save()
+        else:
+            RecurringPayment.objects.create(
+                recurring_item=item,
+                period_label=label,
+                due_date=next_due,
+                amount=item.amount,
+                paid=False
+            )

@@ -1822,6 +1822,7 @@ span.flatpickr-weekday {
 .legend-row__dot--primary { background: var(--accent-primary); }
 .legend-row__dot--success { background: var(--accent-income); }
 .legend-row__dot--danger { background: #ffb2b9; }
+.legend-row__dot--warning { background: var(--accent-pending); }
 
 .stat-bento-card__icon { margin-bottom: 8px; }
 
@@ -2069,7 +2070,7 @@ span.flatpickr-weekday {
 /* ══ Summary Stats Bento ══════════════════ */
 .stat-bento-cards {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 2fr 2fr 1fr 1fr;
   gap: 24px;
   margin-top: 32px;
 }
@@ -2127,6 +2128,7 @@ span.flatpickr-weekday {
 .breakdown-bar__seg--primary     { background: var(--accent-primary); }
 .breakdown-bar__seg--success     { background: #45dfa4; }
 .breakdown-bar__seg--danger { background: #ffb2b9; }
+.breakdown-bar__seg--warning { background: var(--accent-pending); }
 
 /* ── Legend ───────────────────────────────── */
 .legend-row {

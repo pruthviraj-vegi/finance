@@ -88,7 +88,7 @@
 
 <!-- Summary Stats Bento -->
 <div class="stat-bento-cards" id="recurringStats">
-  <!-- Monthly Commitment — spans 2 cols -->
+  <!-- Monthly Commitment — spans 2 cols on responsive, 2fr on desktop -->
   <div class="glass-panel stat-bento-card stat-bento-card--wide">
     <span class="stat-bento-card__label">MONTHLY COMMITMENT</span>
     <div class="stat-bento-card__row">
@@ -96,14 +96,39 @@
     </div>
     <!-- Breakdown bar -->
     <div class="breakdown-bar">
-      {% if total_emis %}<div class="breakdown-bar__seg breakdown-bar__seg--primary" style="flex: {{ total_emis }};"></div>{% endif %}
-      {% if total_subscriptions %}<div class="breakdown-bar__seg breakdown-bar__seg--success" style="flex: {{ total_subscriptions }};"></div>{% endif %}
-      {% if total_renewals %}<div class="breakdown-bar__seg breakdown-bar__seg--danger" style="flex: {{ total_renewals }};"></div>{% endif %}
+      {% if monthly_emis %}<div class="breakdown-bar__seg breakdown-bar__seg--primary" style="flex: {{ monthly_emis }};" title="EMIs"></div>{% endif %}
+      {% if monthly_subscriptions %}<div class="breakdown-bar__seg breakdown-bar__seg--success" style="flex: {{ monthly_subscriptions }};" title="Subscriptions"></div>{% endif %}
+      {% if monthly_renewals %}<div class="breakdown-bar__seg breakdown-bar__seg--danger" style="flex: {{ monthly_renewals }};" title="Renewals"></div>{% endif %}
     </div>
     <div class="legend-row">
-      {% if total_emis %}<div class="legend-row__item"><span class="legend-row__dot legend-row__dot--primary"></span>EMIs</div>{% endif %}
-      {% if total_subscriptions %}<div class="legend-row__item"><span class="legend-row__dot legend-row__dot--success"></span>Subs</div>{% endif %}
-      {% if total_renewals %}<div class="legend-row__item"><span class="legend-row__dot legend-row__dot--danger"></span>Renewals</div>{% endif %}
+      {% if monthly_emis %}<div class="legend-row__item"><span class="legend-row__dot legend-row__dot--primary"></span>EMIs</div>{% endif %}
+      {% if monthly_subscriptions %}<div class="legend-row__item"><span class="legend-row__dot legend-row__dot--success"></span>Subs</div>{% endif %}
+      {% if monthly_renewals %}<div class="legend-row__item"><span class="legend-row__dot legend-row__dot--danger"></span>Renewals</div>{% endif %}
+    </div>
+  </div>
+
+  <!-- Due This Month — spans 2 cols on responsive, 2fr on desktop -->
+  <div class="glass-panel stat-bento-card stat-bento-card--wide">
+    <span class="stat-bento-card__label">DUE THIS MONTH</span>
+    <div class="stat-bento-card__row">
+      <span class="stat-bento-card__value">{{ this_month_unpaid|currency }}</span>
+      <span class="text-color-secondary" style="align-self: flex-end; margin-bottom: 2px; font-size: 0.8125rem;">unpaid of {{ this_month_total|currency }}</span>
+    </div>
+    <!-- Breakdown bar -->
+    <div class="breakdown-bar">
+      {% if this_month_paid > 0 %}
+        <div class="breakdown-bar__seg breakdown-bar__seg--success" style="flex: {{ this_month_paid }};" title="Paid: {{ this_month_paid|currency }}"></div>
+      {% endif %}
+      {% if this_month_unpaid > 0 %}
+        <div class="breakdown-bar__seg breakdown-bar__seg--warning" style="flex: {{ this_month_unpaid }};" title="Unpaid: {{ this_month_unpaid|currency }}"></div>
+      {% endif %}
+      {% if this_month_total == 0 %}
+        <div class="breakdown-bar__seg" style="flex: 1; background: rgba(255,255,255,0.05);" title="No due payments"></div>
+      {% endif %}
+    </div>
+    <div class="legend-row">
+      <div class="legend-row__item"><span class="legend-row__dot legend-row__dot--success"></span>Paid: {{ this_month_paid|currency }}</div>
+      <div class="legend-row__item"><span class="legend-row__dot legend-row__dot--warning"></span>Unpaid: {{ this_month_unpaid|currency }}</div>
     </div>
   </div>
 
