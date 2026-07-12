@@ -1,0 +1,19 @@
+[Unit]
+Description=Celery Worker for Django (Finance)
+After=network.target redis-server.service
+
+[Service]
+Type=simple
+User=chanti
+Group=www-data
+WorkingDirectory=/home/chanti/Projects/Finance
+Environment="PATH=/home/chanti/Projects/Finance/venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=Finance.settings"
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/home/chanti/Projects/Finance/venv/bin/celery \
+    -A Finance worker -l info --concurrency=2
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

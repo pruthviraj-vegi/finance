@@ -1,0 +1,19 @@
+[Unit]
+Description=Celery Beat Scheduler for Django (Finance)
+After=network.target redis-server.service
+
+[Service]
+Type=simple
+User=chanti
+Group=www-data
+WorkingDirectory=/home/chanti/Projects/Finance
+Environment="PATH=/home/chanti/Projects/Finance/venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=Finance.settings"
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/home/chanti/Projects/Finance/venv/bin/celery \
+    -A Finance beat -l info --pidfile=/run/celery/beat.pid --schedule=/home/chanti/Projects/Finance/celerybeat-schedule
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

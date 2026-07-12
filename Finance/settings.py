@@ -106,7 +106,7 @@ TEMPLATES = [
             ],
             "libraries": {
                 "custom_filters": "base.custom_filters",
-            }
+            },
         },
     },
 ]
@@ -351,3 +351,21 @@ LOGGING = {
 TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", default="")
 TELEGRAM_BOT_USERNAME = config("TELEGRAM_BOT_USERNAME", default="FinanceTrackerBot")
 
+# Celery Configuration Options
+CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://127.0.0.1:6379/1")
+CELERY_RESULT_BACKEND = config(
+    "CELERY_RESULT_BACKEND", default="redis://127.0.0.1:6379/1"
+)
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    "send-daily-emi-reminders": {
+        "task": "messaging.tasks.send_daily_emi_reminders",
+        "schedule": crontab(hour=9, minute=0),  # Runs daily at 9:00 AM
+    },
+}
