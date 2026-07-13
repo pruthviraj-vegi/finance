@@ -23,12 +23,12 @@ def send_daily_emi_reminders():
     # 1. Calculate target due date (exactly 3 days from today)
     target_due_date = timezone.now().date() + timedelta(days=3)
 
-    # 2. Query the EMI database for unpaid recurring payments matching target due date
+    # 2. Query the database for unpaid, active recurring payments matching target due date
     # where the associated user has an active Telegram integration.
     payments = RecurringPayment.objects.filter(
-        recurring_item__type=RecurringItem.TypeChoices.EMI,
         due_date=target_due_date,
         paid=False,
+        recurring_item__active=True,
         recurring_item__user__telegram_integration__is_active=True,
     ).select_related(
         "recurring_item",
@@ -51,27 +51,46 @@ def send_daily_emi_reminders():
             continue
 
         item = payment.recurring_item
-        installments_remaining = (
-            (item.total_installments - item.installments_paid)
-            if (
-                item.total_installments is not None
-                and item.installments_paid is not None
-            )
-            else "N/A"
-        )
+        item_type = item.type
+
+        # Determine appropriate title and text depending on the type of recurring item
+        if item_type == RecurringItem.TypeChoices.EMI:
+            title = "EMI Reminder"
+            intro = "You have an upcoming EMI payment due in 3 days"
+        elif item_type == RecurringItem.TypeChoices.SUBSCRIPTION:
+            title = "Subscription Reminder"
+            intro = "You have an upcoming subscription payment due in 3 days"
+        elif item_type == RecurringItem.TypeChoices.RENEWAL:
+            title = "Renewal Reminder"
+            intro = "You have an upcoming renewal payment due in 3 days"
+        else:
+            title = "Payment Reminder"
+            intro = "You have an upcoming payment due in 3 days"
 
         # Formatted Markdown message
         message = (
-            f"📅 *EMI Reminder*\n\n"
+            f"📅 *{title}*\n\n"
             f"Hello {user.first_name or 'there'},\n"
-            f"You have an upcoming EMI payment due in 3 days:\n\n"
+            f"{intro}:\n\n"
             f"• *Item:* {item.name}\n"
             f"• *Amount:* ₹{payment.amount}\n"
             f"• *Due Date:* {payment.due_date.strftime('%d-%b-%Y')}\n"
             f"• *Period:* {payment.period_label}\n"
-            f"• *Remaining Installments:* {installments_remaining}\n\n"
-            f"Please ensure to keep sufficient balance or make the payment soon!"
         )
+
+        # Include remaining installments only for EMIs
+        if item_type == RecurringItem.TypeChoices.EMI:
+            installments_remaining = (
+                (item.total_installments - item.installments_paid)
+                if (
+                    item.total_installments is not None
+                    and item.installments_paid is not None
+                )
+                else "N/A"
+            )
+            message += f"• *Remaining Installments:* {installments_remaining}\n"
+
+        message += f"\nPlease ensure to keep sufficient balance or make the payment soon!"
 
         payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
 
