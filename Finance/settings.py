@@ -366,6 +366,6 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     "send-daily-emi-reminders": {
         "task": "messaging.tasks.send_daily_emi_reminders",
-        "schedule": crontab(hour=9, minute=0),  # Runs daily at 9:00 AM
+        "schedule": crontab(hour=11, minute=30),  # Runs daily at 11:30 AM
     },
 }
