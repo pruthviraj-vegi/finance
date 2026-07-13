@@ -20,13 +20,14 @@ def send_daily_emi_reminders():
         logger.error("TELEGRAM_BOT_TOKEN is not configured in settings.")
         return "Telegram Bot Token not configured"
 
-    # 1. Calculate target due date (exactly 3 days from today)
-    target_due_date = timezone.now().date() + timedelta(days=3)
+    # 1. Calculate target due date (unpaid items due on or before 3 days from today)
+    today = timezone.now().date()
+    target_due_date = today + timedelta(days=3)
 
-    # 2. Query the database for unpaid, active recurring payments matching target due date
+    # 2. Query the database for unpaid, active recurring payments due on or before target due date
     # where the associated user has an active Telegram integration.
     payments = RecurringPayment.objects.filter(
-        due_date=target_due_date,
+        due_date__lte=target_due_date,
         paid=False,
         recurring_item__active=True,
         recurring_item__user__telegram_integration__is_active=True,
@@ -53,19 +54,30 @@ def send_daily_emi_reminders():
         item = payment.recurring_item
         item_type = item.type
 
+        # Calculate days remaining dynamically
+        days_until_due = (payment.due_date - today).days
+        if days_until_due == 0:
+            due_str = "due *today*"
+        elif days_until_due == 1:
+            due_str = "due *tomorrow*"
+        elif days_until_due > 1:
+            due_str = f"due in *{days_until_due} days*"
+        else:
+            due_str = f"*overdue* by *{-days_until_due} days*"
+
         # Determine appropriate title and text depending on the type of recurring item
         if item_type == RecurringItem.TypeChoices.EMI:
             title = "EMI Reminder"
-            intro = "You have an upcoming EMI payment due in 3 days"
+            intro = f"You have an upcoming EMI payment {due_str}"
         elif item_type == RecurringItem.TypeChoices.SUBSCRIPTION:
             title = "Subscription Reminder"
-            intro = "You have an upcoming subscription payment due in 3 days"
+            intro = f"You have an upcoming subscription payment {due_str}"
         elif item_type == RecurringItem.TypeChoices.RENEWAL:
             title = "Renewal Reminder"
-            intro = "You have an upcoming renewal payment due in 3 days"
+            intro = f"You have an upcoming renewal payment {due_str}"
         else:
             title = "Payment Reminder"
-            intro = "You have an upcoming payment due in 3 days"
+            intro = f"You have an upcoming payment {due_str}"
 
         # Formatted Markdown message
         message = (
@@ -90,7 +102,9 @@ def send_daily_emi_reminders():
             )
             message += f"• *Remaining Installments:* {installments_remaining}\n"
 
-        message += f"\nPlease ensure to keep sufficient balance or make the payment soon!"
+        message += (
+            f"\nPlease ensure to keep sufficient balance or make the payment soon!"
+        )
 
         payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
 
