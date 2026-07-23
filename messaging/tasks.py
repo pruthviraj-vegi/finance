@@ -15,6 +15,8 @@ def send_daily_emi_reminders():
     Celery task to send daily EMI reminders to active Telegram users.
     Sends notifications for EMIs due in exactly 3 days.
     """
+    logger.info("Celery task 'send_daily_emi_reminders' started at %s.", timezone.now().strftime("%Y-%m-%d %H:%M:%S"))
+
     bot_token = getattr(settings, "TELEGRAM_BOT_TOKEN", None)
     if not bot_token:
         logger.error("TELEGRAM_BOT_TOKEN is not configured in settings.")
@@ -26,16 +28,29 @@ def send_daily_emi_reminders():
 
     # 2. Query the database for unpaid, active recurring payments due on or before target due date
     # where the associated user has an active Telegram integration.
-    payments = RecurringPayment.objects.filter(
-        due_date__lte=target_due_date,
-        paid=False,
-        recurring_item__active=True,
-        recurring_item__user__telegram_integration__is_active=True,
-    ).select_related(
-        "recurring_item",
-        "recurring_item__user",
-        "recurring_item__user__telegram_integration",
+    payments = list(
+        RecurringPayment.objects.filter(
+            due_date__lte=target_due_date,
+            paid=False,
+            recurring_item__active=True,
+            recurring_item__user__telegram_integration__is_active=True,
+        ).select_related(
+            "recurring_item",
+            "recurring_item__user",
+            "recurring_item__user__telegram_integration",
+        )
     )
+
+    total_eligible = len(payments)
+    logger.info(
+        "Query completed: Found %d eligible recurring payment(s) due on or before %s for active Telegram users.",
+        total_eligible,
+        target_due_date,
+    )
+
+    if total_eligible == 0:
+        logger.info("Celery task 'send_daily_emi_reminders' finished. No EMI reminders to send today.")
+        return "Completed sending daily EMI reminders. Sent: 0, Failed: 0."
 
     total_sent = 0
     total_failed = 0
@@ -128,4 +143,7 @@ def send_daily_emi_reminders():
             )
             total_failed += 1
 
-    return f"Completed sending daily EMI reminders. Sent: {total_sent}, Failed: {total_failed}."
+    summary_msg = f"Completed sending daily EMI reminders. Sent: {total_sent}, Failed: {total_failed}."
+    logger.info("Celery task 'send_daily_emi_reminders' finished. Summary: %s", summary_msg)
+    return summary_msg
+

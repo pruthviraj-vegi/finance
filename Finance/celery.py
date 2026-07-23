@@ -1,6 +1,5 @@
 import os
 from celery import Celery
-from celery.signals import worker_ready
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Finance.settings")
@@ -22,9 +21,5 @@ def debug_task(self):
     print(f"Request: {self.request!r}")
 
 
-@worker_ready.connect
-def at_start(sender, **kwargs):
-    """Trigger the daily EMI reminders task once immediately when Celery starts."""
-    from messaging.tasks import send_daily_emi_reminders
-    send_daily_emi_reminders.delay()
+
 

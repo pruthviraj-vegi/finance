@@ -326,6 +326,31 @@ LOGGING = {
             "level": "ERROR",
             "propagate": False,
         },
+        "messaging": {
+            "handlers": ["console", "info_file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "messaging.tasks": {
+            "handlers": ["console", "info_file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "celery": {
+            "handlers": ["console", "info_file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "celery.task": {
+            "handlers": ["console", "info_file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "celery.beat": {
+            "handlers": ["console", "info_file", "error_file"],
+            "level": "INFO",
+            "propagate": False,
+        },
         # Your app-specific logger
         "myapp": {
             "handlers": ["debug_file", "info_file", "error_file"],
@@ -340,8 +365,8 @@ LOGGING = {
         },
         # Root logger for your apps
         "": {
-            "handlers": ["debug_file", "info_file", "error_file"],
-            "level": "DEBUG",
+            "handlers": ["console", "debug_file", "info_file", "error_file"],
+            "level": "INFO",
             "propagate": False,
         },
     },
