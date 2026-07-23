@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% load custom_filters %}
 
 {% block title %}Recurring Dashboard — My Finance{% endblock %}
@@ -7,11 +8,36 @@
 
 {% block content %}
 
+<!-- Top Filter Bar -->
+<div class="recurring-filter-bar mb-20">
+  <div class="filter-pills" id="contentFilterPills">
+    <button type="button" class="filter-pill active" data-filter="all">
+      <span>All</span>
+      <span class="filter-pill__count" id="countAllPill">{{ total_active }}</span>
+    </button>
+    <button type="button" class="filter-pill filter-pill--primary" data-filter="emi">
+      <span class="filter-pill__dot filter-pill__dot--primary"></span>
+      <span>EMI</span>
+      <span class="filter-pill__count" id="countEmiPill">0</span>
+    </button>
+    <button type="button" class="filter-pill filter-pill--success" data-filter="subscription">
+      <span class="filter-pill__dot filter-pill__dot--success"></span>
+      <span>Subs</span>
+      <span class="filter-pill__count" id="countSubPill">0</span>
+    </button>
+    <button type="button" class="filter-pill filter-pill--danger" data-filter="renewal">
+      <span class="filter-pill__dot filter-pill__dot--danger"></span>
+      <span>Renewals</span>
+      <span class="filter-pill__count" id="countRenPill">0</span>
+    </button>
+  </div>
+</div>
+
 <!-- Card Grid -->
 <div class="dashboard-grid" id="recurringGrid">
 
   {% for item in active_items %}
-  <div class="glass-panel dash-card" style="animation-delay: {{ forloop.counter0 }}00ms;">
+  <div class="glass-panel dash-card" data-type="{{ item.type }}" style="animation-delay: {{ forloop.counter0 }}00ms;">
 
     <!-- ── Top: Type label + Icon/Ring ── -->
     <div class="dash-card__top">
@@ -78,7 +104,7 @@
   {% endfor %}
 
   <!-- Add New Recurring Card -->
-  <a href="{% url 'expense:recurring_item_create' %}" class="dash-card dash-card--add" style="animation-delay: {{ active_items|length }}00ms;">
+  <a href="{% url 'expense:recurring_item_create' %}" class="dash-card dash-card--add" data-type="add" style="animation-delay: {{ active_items|length }}00ms;">
     <div class="add-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </div>
@@ -96,14 +122,14 @@
     </div>
     <!-- Breakdown bar -->
     <div class="breakdown-bar">
-      {% if monthly_emis %}<div class="breakdown-bar__seg breakdown-bar__seg--primary" style="flex: {{ monthly_emis }};" title="EMIs"></div>{% endif %}
-      {% if monthly_subscriptions %}<div class="breakdown-bar__seg breakdown-bar__seg--success" style="flex: {{ monthly_subscriptions }};" title="Subscriptions"></div>{% endif %}
-      {% if monthly_renewals %}<div class="breakdown-bar__seg breakdown-bar__seg--danger" style="flex: {{ monthly_renewals }};" title="Renewals"></div>{% endif %}
+      {% if monthly_emis %}<div class="breakdown-bar__seg breakdown-bar__seg--primary cursor-pointer" data-filter="emi" style="flex: {{ monthly_emis }};" title="EMIs"></div>{% endif %}
+      {% if monthly_subscriptions %}<div class="breakdown-bar__seg breakdown-bar__seg--success cursor-pointer" data-filter="subscription" style="flex: {{ monthly_subscriptions }};" title="Subscriptions"></div>{% endif %}
+      {% if monthly_renewals %}<div class="breakdown-bar__seg breakdown-bar__seg--danger cursor-pointer" data-filter="renewal" style="flex: {{ monthly_renewals }};" title="Renewals"></div>{% endif %}
     </div>
     <div class="legend-row">
-      {% if monthly_emis %}<div class="legend-row__item"><span class="legend-row__dot legend-row__dot--primary"></span>EMIs</div>{% endif %}
-      {% if monthly_subscriptions %}<div class="legend-row__item"><span class="legend-row__dot legend-row__dot--success"></span>Subs</div>{% endif %}
-      {% if monthly_renewals %}<div class="legend-row__item"><span class="legend-row__dot legend-row__dot--danger"></span>Renewals</div>{% endif %}
+      {% if monthly_emis %}<div class="legend-row__item cursor-pointer" data-filter="emi"><span class="legend-row__dot legend-row__dot--primary"></span>EMIs</div>{% endif %}
+      {% if monthly_subscriptions %}<div class="legend-row__item cursor-pointer" data-filter="subscription"><span class="legend-row__dot legend-row__dot--success"></span>Subs</div>{% endif %}
+      {% if monthly_renewals %}<div class="legend-row__item cursor-pointer" data-filter="renewal"><span class="legend-row__dot legend-row__dot--danger"></span>Renewals</div>{% endif %}
     </div>
   </div>
 
@@ -156,4 +182,6 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/pages/recurring_dashboard.js' %}"></script>
 {% endblock %}
+
