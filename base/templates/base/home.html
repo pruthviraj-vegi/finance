@@ -157,7 +157,7 @@
           </div>
         </div>
         <div class="category-breakdown-legend" id="categoryLegend">
-          {% for cat in category_breakdown|slice:":4" %}
+          {% for cat in category_breakdown %}
             <div class="category-breakdown-legend-item" 
                  style="cursor: pointer;"
                  data-name="{{ cat.name }}"
