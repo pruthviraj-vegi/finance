@@ -119,4 +119,122 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // Category Breakdown interactive highlight on click
+    setupCategoryBreakdown();
 });
+
+function setupCategoryBreakdown() {
+    const segments = document.querySelectorAll('.category-segment');
+    const legendItems = document.querySelectorAll('.category-breakdown-legend-item');
+    const centerVal = document.getElementById('donutCenterVal');
+    const centerLbl = document.getElementById('donutCenterLbl');
+    const centerContainer = document.getElementById('donutCenter');
+
+    if (!centerVal || !centerLbl) return;
+
+    const defaultVal = centerVal.getAttribute('data-default-val') || centerVal.textContent;
+    const defaultLbl = centerLbl.getAttribute('data-default-lbl') || centerLbl.textContent;
+
+    let activeCategory = null;
+
+    function selectCategory(name, amount, pct, color) {
+        if (activeCategory === name) {
+            resetCategorySelection();
+            return;
+        }
+
+        activeCategory = name;
+
+        // Highlight center text with category amount and percentage (no category name)
+        centerVal.textContent = amount;
+        centerLbl.textContent = `${pct}%`;
+        centerLbl.setAttribute('title', `${name}: ${amount} (${pct}%)`);
+        centerVal.style.color = color || 'var(--accent-primary)';
+
+        // Adjust font size dynamically if amount string is long
+        if (amount.length > 9) {
+            centerVal.style.fontSize = '0.78rem';
+        } else if (amount.length > 7) {
+            centerVal.style.fontSize = '0.84rem';
+        } else {
+            centerVal.style.fontSize = '0.9375rem';
+        }
+
+        // Highlight SVG path segment
+        segments.forEach(path => {
+            const pathName = path.getAttribute('data-name');
+            const pathColor = path.getAttribute('data-color');
+            if (pathName === name) {
+                path.style.opacity = '1';
+                path.style.strokeWidth = '4';
+                path.style.filter = `drop-shadow(0 0 3px ${pathColor})`;
+            } else {
+                path.style.opacity = '0.25';
+                path.style.strokeWidth = '2.5';
+                path.style.filter = 'none';
+            }
+        });
+
+        // Highlight legend item
+        legendItems.forEach(item => {
+            const itemName = item.getAttribute('data-name');
+            if (itemName === name) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    function resetCategorySelection() {
+        activeCategory = null;
+        centerVal.textContent = defaultVal;
+        centerLbl.textContent = defaultLbl;
+        centerVal.style.color = 'var(--text-primary)';
+        centerVal.style.fontSize = '0.875rem';
+
+        segments.forEach(path => {
+            const pathColor = path.getAttribute('data-color');
+            path.style.opacity = '0.9';
+            path.style.strokeWidth = '3';
+            path.style.filter = pathColor ? `drop-shadow(0 0 3px ${pathColor})` : 'none';
+        });
+
+        legendItems.forEach(item => {
+            item.classList.remove('active');
+        });
+    }
+
+    // Donut SVG path click listeners
+    segments.forEach(path => {
+        path.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const name = path.getAttribute('data-name');
+            const amount = path.getAttribute('data-amount');
+            const pct = path.getAttribute('data-percentage');
+            const color = path.getAttribute('data-color');
+            selectCategory(name, amount, pct, color);
+        });
+    });
+
+    // Legend item click listeners
+    legendItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const name = item.getAttribute('data-name');
+            const amount = item.getAttribute('data-amount');
+            const pct = item.getAttribute('data-percentage');
+            const color = item.getAttribute('data-color');
+            selectCategory(name, amount, pct, color);
+        });
+    });
+
+    // Click center to reset to total
+    if (centerContainer) {
+        centerContainer.addEventListener('click', (e) => {
+            e.stopPropagation();
+            resetCategorySelection();
+        });
+    }
+}

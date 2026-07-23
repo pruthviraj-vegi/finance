@@ -119,39 +119,59 @@
   </div>
 
   <!-- Donut Chart Glass Card -->
-  <div class="glass-panel d-flex flex-col" style="min-height: 320px;">
+  <div class="glass-panel d-flex flex-col category-breakdown-card">
     <div class="category-breakdown-container">
       <div class="category-breakdown-header-wrap">
         <h3 class="trend-chart-title">Category Breakdown</h3>
         <p class="trend-chart-subtitle">Monthly expenditure distribution</p>
       </div>
-      <div class="category-breakdown-donut-wrapper">
-        <svg class="category-breakdown-donut-svg" viewBox="0 0 36 36">
-          <circle cx="18" cy="18" r="15.9155" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="3"></circle>
-          {% if category_breakdown %}
-            {% for cat in category_breakdown %}
-              <path class="transition-all duration-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="{{ cat.color }}" stroke-dasharray="{{ cat.dash_array }}" stroke-dashoffset="{{ cat.dash_offset }}" stroke-linecap="round" stroke-width="3" style="filter: drop-shadow({{ cat.color }} 0px 0px 3px); opacity: 0.9;"></path>
-            {% endfor %}
-          {% else %}
-            <circle cx="18" cy="18" r="15.9155" fill="none" stroke="var(--glass-border)" stroke-dasharray="100, 100" stroke-width="3"></circle>
-          {% endif %}
-        </svg>
-        <div class="category-breakdown-donut-center">
-          <div class="category-breakdown-donut-inner">
-            <span class="category-breakdown-donut-val">{{ total_expense|currency_abbreviation }}</span>
-            <span class="category-breakdown-donut-lbl">TOTAL</span>
+      <div class="category-breakdown-body">
+        <div class="category-breakdown-donut-wrapper">
+          <svg class="category-breakdown-donut-svg" viewBox="-4 -4 44 44">
+            <circle cx="18" cy="18" r="15.9155" fill="none" stroke="rgba(255, 255, 255, 0.05)" stroke-width="3"></circle>
+            {% if category_breakdown %}
+              {% for cat in category_breakdown %}
+                <path class="category-segment transition-all duration-500" 
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                      fill="none" 
+                      stroke="{{ cat.color }}" 
+                      stroke-dasharray="{{ cat.dash_array }}" 
+                      stroke-dashoffset="{{ cat.dash_offset }}" 
+                      stroke-linecap="round" 
+                      stroke-width="3" 
+                      style="filter: drop-shadow({{ cat.color }} 0px 0px 3px); opacity: 0.9; cursor: pointer;"
+                      data-name="{{ cat.name }}"
+                      data-amount="{{ cat.amount|currency }}"
+                      data-percentage="{{ cat.percentage|floatformat:1 }}"
+                      data-color="{{ cat.color }}"></path>
+              {% endfor %}
+            {% else %}
+              <circle cx="18" cy="18" r="15.9155" fill="none" stroke="var(--glass-border)" stroke-dasharray="100, 100" stroke-width="3"></circle>
+            {% endif %}
+          </svg>
+          <div class="category-breakdown-donut-center" id="donutCenter" style="cursor: pointer;" title="Click to view total / reset">
+            <div class="category-breakdown-donut-inner">
+              <span class="category-breakdown-donut-val" id="donutCenterVal" data-default-val="{{ total_expense|currency_abbreviation }}">{{ total_expense|currency_abbreviation }}</span>
+              <span class="category-breakdown-donut-lbl" id="donutCenterLbl" data-default-lbl="TOTAL">TOTAL</span>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="category-breakdown-legend">
-        {% for cat in category_breakdown|slice:":4" %}
-          <div class="category-breakdown-legend-item">
-            <div class="category-breakdown-legend-dot" style="background-color: {{ cat.color }};"></div>
-            <span class="category-breakdown-legend-text" title="{{ cat.name }}">{{ cat.name }}</span>
-          </div>
-        {% empty %}
-          <div class="text-12 text-center text-secondary" style="grid-column: span 2;">No expense data available</div>
-        {% endfor %}
+        <div class="category-breakdown-legend" id="categoryLegend">
+          {% for cat in category_breakdown|slice:":4" %}
+            <div class="category-breakdown-legend-item" 
+                 style="cursor: pointer;"
+                 data-name="{{ cat.name }}"
+                 data-amount="{{ cat.amount|currency }}"
+                 data-percentage="{{ cat.percentage|floatformat:1 }}"
+                 data-color="{{ cat.color }}">
+              <div class="category-breakdown-legend-dot" style="background-color: {{ cat.color }};"></div>
+              <span class="category-breakdown-legend-text" title="{{ cat.name }}">{{ cat.name }}</span>
+              <span class="category-breakdown-legend-amount">{{ cat.amount|currency_abbreviation }}</span>
+            </div>
+          {% empty %}
+            <div class="text-12 text-center text-secondary">No expense data available</div>
+          {% endfor %}
+        </div>
       </div>
     </div>
   </div>

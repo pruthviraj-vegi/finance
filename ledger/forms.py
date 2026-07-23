@@ -56,7 +56,7 @@ class TransactionForm(forms.ModelForm):
         fields = ["contact", "direction", "amount", "date", "reason", "due_date"]
         widgets = {
             "contact": forms.Select(attrs={"class": "form-select"}),
-            "direction": forms.Select(attrs={"class": "form-select"}),
+            "direction": forms.RadioSelect(attrs={"class": "segmented-radio-input"}),
             "amount": forms.TextInput(attrs={
                 "class": "form-input indian-number", 
                 "placeholder": "0.00"
@@ -82,6 +82,11 @@ class TransactionForm(forms.ModelForm):
         if user:
             # Only show contacts belonging to the logged in user
             self.fields["contact"].queryset = Contact.objects.filter(user=user)
+
+        # Remove blank option '--------' and set default to TAKEN
+        self.fields["direction"].choices = Transaction.DirectionChoices.choices
+        if not self.instance.pk and not self.initial.get("direction"):
+            self.initial["direction"] = Transaction.DirectionChoices.TAKEN
 
     def clean_amount(self):
         amount = self.cleaned_data.get("amount")

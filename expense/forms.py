@@ -43,7 +43,7 @@ class TransactionForm(forms.ModelForm):
                 "placeholder": "0.00",
                 "required": True
             }),
-            "type": forms.Select(attrs={"class": "form-select", "required": True}),
+            "type": forms.RadioSelect(attrs={"class": "segmented-radio-input"}),
             "category": forms.Select(attrs={"class": "form-select", "required": True}),
             "date": forms.DateInput(attrs={
                 "class": "form-input",
@@ -67,6 +67,11 @@ class TransactionForm(forms.ModelForm):
             self.fields["recurring_payment"].queryset = RecurringPayment.objects.filter(
                 recurring_item__user=user
             )
+
+        # Remove blank option '--------' and default type to EXPENSE
+        self.fields["type"].choices = Transaction.TypeChoices.choices
+        if not self.instance.pk and not self.initial.get("type"):
+            self.initial["type"] = Transaction.TypeChoices.EXPENSE
 
     def clean_amount(self):
         amount = self.cleaned_data.get("amount")
@@ -98,14 +103,14 @@ class RecurringItemForm(forms.ModelForm):
                 "placeholder": "e.g. Netflix, Car Loan EMI",
                 "required": True
             }),
-            "type": forms.Select(attrs={"class": "form-select", "required": True}),
+            "type": forms.RadioSelect(attrs={"class": "segmented-radio-input"}),
             "category": forms.Select(attrs={"class": "form-select", "required": True}),
             "amount": forms.TextInput(attrs={
                 "class": "form-input indian-number",
                 "placeholder": "0.00",
                 "required": True
             }),
-            "frequency": forms.Select(attrs={"class": "form-select", "required": True}),
+            "frequency": forms.RadioSelect(attrs={"class": "segmented-radio-input"}),
             "start_date": forms.DateInput(attrs={
                 "class": "form-input",
                 "type": "date",
@@ -141,6 +146,15 @@ class RecurringItemForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if user:
             self.fields["category"].queryset = Category.objects.filter(user=user)
+
+        # Remove blank choice '--------' and default initial values
+        self.fields["type"].choices = RecurringItem.TypeChoices.choices
+        self.fields["frequency"].choices = RecurringItem.FrequencyChoices.choices
+        if not self.instance.pk:
+            if not self.initial.get("type"):
+                self.initial["type"] = RecurringItem.TypeChoices.SUBSCRIPTION
+            if not self.initial.get("frequency"):
+                self.initial["frequency"] = RecurringItem.FrequencyChoices.MONTHLY
 
     def clean_name(self):
         name = self.cleaned_data.get("name")
